@@ -1,6 +1,7 @@
 package com.example.hyperisland.xposed
 
 import android.app.DownloadManager
+import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.ContentValues
@@ -21,13 +22,16 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage
  */
 object InProcessController {
 
-    private const val ACTION    = "com.example.hyperisland.INTERNAL_CTRL"
-    private const val EXTRA_CMD = "cmd"
-    private const val EXTRA_ID  = "dlId"
+    private const val ACTION          = "com.example.hyperisland.INTERNAL_CTRL"
+    private const val EXTRA_CMD       = "cmd"
+    private const val EXTRA_ID        = "dlId"
+    private const val EXTRA_NOTIF_ID  = "notifId"
+    private const val EXTRA_NOTIF_TAG = "notifTag"
 
-    const val CMD_PAUSE  = "pause"
-    const val CMD_RESUME = "resume"
-    const val CMD_CANCEL = "cancel"
+    const val CMD_PAUSE   = "pause"
+    const val CMD_RESUME  = "resume"
+    const val CMD_CANCEL  = "cancel"
+    const val CMD_DISMISS = "dismiss"
 
     // 来自 JADX：MiuiDownloads.Impl 状态常量
     private const val STATUS_PENDING       = 190
@@ -60,9 +64,18 @@ object InProcessController {
                 val cmd = intent.getStringExtra(EXTRA_CMD)
                 XposedBridge.log("HyperIsland: onReceive cmd=$cmd id=$id")
                 when (cmd) {
-                    CMD_PAUSE  -> if (id > 0) pause(appCtx, id)  else pauseAll(appCtx)
-                    CMD_RESUME -> if (id > 0) resume(appCtx, id) else resumeAll(appCtx)
-                    CMD_CANCEL -> if (id > 0) cancel(appCtx, id) else cancelAll(appCtx)
+                    CMD_PAUSE   -> if (id > 0) pause(appCtx, id)  else pauseAll(appCtx)
+                    CMD_RESUME  -> if (id > 0) resume(appCtx, id) else resumeAll(appCtx)
+                    CMD_CANCEL  -> if (id > 0) cancel(appCtx, id) else cancelAll(appCtx)
+                    CMD_DISMISS -> {
+                        val notifId  = intent.getIntExtra(EXTRA_NOTIF_ID, -1)
+                        val notifTag = intent.getStringExtra(EXTRA_NOTIF_TAG)
+                        if (notifId > 0) {
+                            val nm = ctx.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
+                            nm?.cancel(notifTag, notifId)
+                            XposedBridge.log("HyperIsland: dismiss notifId=$notifId tag=$notifTag")
+                        }
+                    }
                 }
             }
         }
@@ -115,6 +128,18 @@ object InProcessController {
     fun pauseIntent(context: Context, downloadId: Long)  = makeIntent(context, CMD_PAUSE,  downloadId, reqCode(downloadId, 0))
     fun resumeIntent(context: Context, downloadId: Long) = makeIntent(context, CMD_RESUME, downloadId, reqCode(downloadId, 1))
     fun cancelIntent(context: Context, downloadId: Long) = makeIntent(context, CMD_CANCEL, downloadId, reqCode(downloadId, 2))
+
+    fun dismissIntent(context: Context, notifId: Int, notifTag: String?): PendingIntent {
+        val intent = Intent(ACTION).apply {
+            putExtra(EXTRA_CMD, CMD_DISMISS)
+            putExtra(EXTRA_NOTIF_ID, notifId)
+            if (notifTag != null) putExtra(EXTRA_NOTIF_TAG, notifTag)
+        }
+        return PendingIntent.getBroadcast(
+            context, notifId + 100000, intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+    }
 
     private fun reqCode(id: Long, offset: Int) = ((id and 0xFFFFF) * 3 + offset).toInt()
 

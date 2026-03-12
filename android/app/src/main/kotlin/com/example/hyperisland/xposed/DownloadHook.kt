@@ -175,21 +175,19 @@ class DownloadHook : IXposedHookLoadPackage {
             // 把 pause/cancel 写入标准 notification.actions[]
             // MIUI 超级岛点击按钮时，触发的是 actions[] 里的 PendingIntent
             val isComplete = progress >= 100
-            val newActions = buildList {
-                if (!isComplete) {
-                    add(Notification.Action.Builder(
-                        Icon.createWithResource(context, android.R.drawable.ic_media_pause),
-                        "暂停",
-                        InProcessController.pauseIntent(context, downloadId)
-                    ).build())
-                }
-                add(Notification.Action.Builder(
+            // 下载完成时清空按钮，下载中时显示暂停+取消
+            notif.actions = if (isComplete) emptyArray() else arrayOf(
+                Notification.Action.Builder(
+                    Icon.createWithResource(context, android.R.drawable.ic_media_pause),
+                    "暂停",
+                    InProcessController.pauseIntent(context, downloadId)
+                ).build(),
+                Notification.Action.Builder(
                     Icon.createWithResource(context, android.R.drawable.ic_delete),
-                    if (isComplete) "完成" else "取消",
+                    "取消",
                     InProcessController.cancelIntent(context, downloadId)
-                ).build())
-            }
-            notif.actions = newActions.toTypedArray()
+                ).build()
+            )
 
             DownloadIslandNotification.inject(context, extras, title, text, progress, appName, fileName, downloadId, lpparam.packageName)
             extras.putBoolean("hyperisland_processed", true)

@@ -31,7 +31,8 @@ object DownloadIslandNotification {
 
             val downloadIconRes = if (isComplete) android.R.drawable.stat_sys_download_done
                 else android.R.drawable.stat_sys_download
-            val downloadIcon = Icon.createWithResource(context, downloadIconRes)
+            val tintColor = if (isComplete) 0xFF4CAF50.toInt() else 0xFF2196F3.toInt()
+            val downloadIcon = Icon.createWithResource(context, downloadIconRes).apply { setTint(tintColor) }
 
             val pausePendingIntent  = InProcessController.pauseIntent(context, downloadId)
             val cancelPendingIntent = InProcessController.cancelIntent(context, downloadId)
@@ -42,8 +43,7 @@ object DownloadIslandNotification {
                 islandFirstFloat = false
                 enableFloat = false
                 updatable = true
-                ticker = displayTitle
-                tickerPic = downloadIconKey
+                //ticker = displayTitle
 
                 // 小米岛 摘要态
                 island {
@@ -56,7 +56,7 @@ object DownloadIslandNotification {
                                 pic = downloadIconKey
                             }
                             textInfo {
-                                this.title = if isComplete "下载中$progress%" else 下载完成
+                                this.title = if (isComplete) "下载完成" else "下载中$progress%"
                             }
                         }
                         imageTextInfoRight {
@@ -89,9 +89,9 @@ object DownloadIslandNotification {
                     pic = downloadIconKey
                 }
 
-                // 操作按钮
-                textButton {
-                    if (!isComplete) {
+                // 操作按钮（下载完成时不显示按钮）
+                if (!isComplete) {
+                    textButton {
                         addActionInfo {
                             val pauseAction = Notification.Action.Builder(
                                 Icon.createWithResource(context, android.R.drawable.ic_media_pause),
@@ -101,20 +101,14 @@ object DownloadIslandNotification {
                             action = createAction("action_pause", pauseAction)
                             actionTitle = "暂停"
                         }
-                    }
-                    addActionInfo {
-                        val cancelAction = Notification.Action.Builder(
-                            Icon.createWithResource(context, android.R.drawable.ic_delete),
-                            if (isComplete) "完成" else "取消",
-                            cancelPendingIntent
-                        ).build()
-                        action = createAction("action_cancel", cancelAction)
-                        actionTitle = if (isComplete) "完成" else "取消"
-                        if (isComplete) {
-                            actionBgColor = "#006EFF"
-                            actionBgColorDark = "#006EFF"
-                            actionTitleColor = "#FFFFFF"
-                            actionTitleColorDark = "#FFFFFF"
+                        addActionInfo {
+                            val cancelAction = Notification.Action.Builder(
+                                Icon.createWithResource(context, android.R.drawable.ic_delete),
+                                "取消",
+                                cancelPendingIntent
+                            ).build()
+                            action = createAction("action_cancel", cancelAction)
+                            actionTitle = "取消"
                         }
                     }
                 }
