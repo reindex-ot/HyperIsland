@@ -46,7 +46,6 @@ flutter {
 }
 
 dependencies {
-    implementation("com.github.ghhccghk:HyperFocusApi:2.0")
     implementation("com.xzakota.hyper.notification:focus-api:1.4")
     compileOnly("de.robv.android.xposed:api:82")
     compileOnly("de.robv.android.xposed:api:82:sources")

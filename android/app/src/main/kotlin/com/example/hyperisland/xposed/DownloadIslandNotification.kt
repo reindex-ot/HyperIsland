@@ -1,11 +1,9 @@
 package com.example.hyperisland.xposed
 
 import android.app.Notification
-import android.app.PendingIntent
-import android.content.Context
-import android.content.Intent
 import android.graphics.drawable.Icon
 import android.os.Bundle
+import android.content.Context
 import com.xzakota.hyper.notification.focus.FocusNotification
 import de.robv.android.xposed.XposedBridge
 
@@ -35,8 +33,11 @@ object DownloadIslandNotification {
                 else android.R.drawable.stat_sys_download
             val downloadIcon = Icon.createWithResource(context, downloadIconRes)
 
-            val pausePendingIntent = createControlIntent(context, DownloadControlReceiver.ACTION_PAUSE, downloadId, fileName, packageName, 1001)
-            val cancelPendingIntent = createControlIntent(context, DownloadControlReceiver.ACTION_CANCEL, downloadId, fileName, packageName, 1002)
+            // 确保进程内 Receiver 已注册
+            InProcessController.ensureRegistered(context)
+
+            val pausePendingIntent  = InProcessController.pauseIntent(context, downloadId)
+            val cancelPendingIntent = InProcessController.cancelIntent(context, downloadId)
 
             val islandExtras = FocusNotification.buildV3 {
                 val downloadIconKey = createPicture("key_download_icon", downloadIcon)
@@ -128,25 +129,4 @@ object DownloadIslandNotification {
         }
     }
 
-    private fun createControlIntent(
-        context: Context,
-        action: String,
-        downloadId: Long,
-        fileName: String,
-        packageName: String,
-        requestCode: Int
-    ): PendingIntent {
-        val intent = Intent(DownloadControlReceiver.ACTION_CONTROL).apply {
-            putExtra(DownloadControlReceiver.EXTRA_ACTION, action)
-            putExtra(DownloadControlReceiver.EXTRA_DOWNLOAD_ID, downloadId)
-            putExtra(DownloadControlReceiver.EXTRA_FILE_NAME, fileName)
-            putExtra(DownloadControlReceiver.EXTRA_PACKAGE_NAME, packageName)
-        }
-        return PendingIntent.getBroadcast(
-            context,
-            requestCode,
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-    }
 }

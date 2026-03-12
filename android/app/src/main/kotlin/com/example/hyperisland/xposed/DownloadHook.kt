@@ -1,6 +1,7 @@
 package com.example.hyperisland.xposed
 
 import android.app.Notification
+import android.graphics.drawable.Icon
 import android.os.Bundle
 import de.robv.android.xposed.IXposedHookLoadPackage
 import de.robv.android.xposed.XC_MethodHook
@@ -39,6 +40,14 @@ class DownloadHook : IXposedHookLoadPackage {
     }
 
     override fun handleLoadPackage(lpparam: XC_LoadPackage.LoadPackageParam) {
+        val pkg = lpparam.packageName
+        // 只处理下载相关的包，避免干扰其他应用
+        val isTarget = pkg == "com.android.providers.downloads" ||
+                       pkg == "com.xiaomi.android.app.downloadmanager"
+        if (!isTarget) return
+
+        XposedBridge.log("HyperIsland: handleLoadPackage pkg=$pkg")
+
         try {
             hookNotificationBuilder(lpparam)
 
@@ -46,9 +55,14 @@ class DownloadHook : IXposedHookLoadPackage {
             hookNotifyMethod(nmClass, lpparam, hasTag = true)
             hookNotifyMethod(nmClass, lpparam, hasTag = false)
 
+            // 在下载 Manager App 进程里 Hook MiuiDownloadManager
+            if (pkg == "com.xiaomi.android.app.downloadmanager") {
+                InProcessController.hookMiuiDownloadManager(lpparam)
+            }
+
             hookDownloadManagerService(lpparam)
         } catch (e: Throwable) {
-            XposedBridge.log("HyperIsland: Error hooking: ${e.message}")
+            XposedBridge.log("HyperIsland: Error hooking $pkg: ${e.message}")
         }
     }
 
@@ -86,7 +100,11 @@ class DownloadHook : IXposedHookLoadPackage {
                         if (downloadId > 0) { info.downloadId = downloadId; downloadIdMap[downloadId] = lpparam.packageName }
                         processedNotifications.entries.removeIf { now - it.value.lastProcessTime > 10000 }
 
-                        XposedBridge.log("HyperIsland: [Builder] $appName | $fileName | $progress%")
+                        // 打印所有 extras key，用于确认真实 downloadId 字段名
+                        if (downloadId <= 0) {
+                            XposedBridge.log("HyperIsland: [Builder] extras keys=${extras.keySet().joinToString()}")
+                        }
+                        XposedBridge.log("HyperIsland: [Builder] $appName | $fileName | $progress% | id=$downloadId")
 
                         val context = getContext(lpparam) ?: return
                         DownloadIslandNotification.inject(context, extras, title, text, progress, appName, fileName, downloadId, lpparam.packageName)
@@ -132,7 +150,10 @@ class DownloadHook : IXposedHookLoadPackage {
 
             val appName = lpparam.packageName.substringAfterLast(".").replaceFirstChar { it.uppercase() }
             val fileName = extractFileName(title, text, extras)
-            val downloadId = extractDownloadId(extras)
+            // 优先 extras，其次解析 tag（AOSP tag 格式: "2162:2163:"），最后用 notifId
+            val downloadId = extractDownloadId(extras).takeIf { it > 0 }
+                ?: extractIdFromTag(tag).takeIf { it > 0 }
+                ?: id.toLong()
             val progress = extractProgress(title, text, extras)
             val key = "${lpparam.packageName}_${tag ?: "null"}_$id"
             val now = System.currentTimeMillis()
@@ -143,7 +164,7 @@ class DownloadHook : IXposedHookLoadPackage {
             if (downloadId > 0) { info.downloadId = downloadId; downloadIdMap[downloadId] = lpparam.packageName }
             processedNotifications.entries.removeIf { now - it.value.lastProcessTime > 10000 }
 
-            XposedBridge.log("HyperIsland: [Notify] $appName | $fileName | $progress%")
+            XposedBridge.log("HyperIsland: [Notify] $appName | $fileName | $progress% | notifId=$id | tag=$tag | downloadId=$downloadId")
 
             val context = getContext(lpparam) ?: return
             DownloadIslandNotification.inject(context, extras, title, text, progress, appName, fileName, downloadId, lpparam.packageName)
@@ -207,6 +228,7 @@ class DownloadHook : IXposedHookLoadPackage {
     }
 
     private fun isDownloadNotification(title: String, text: String, extras: Bundle): Boolean =
+        extras.containsKey("extra_download_id") ||  // MiuiDownloadManager 真实 key
         title.contains("正在下载") ||
         title.contains("下载", ignoreCase = true) ||
         title.contains("download", ignoreCase = true) ||
@@ -214,6 +236,12 @@ class DownloadHook : IXposedHookLoadPackage {
         extras.containsKey("progress")
 
     private fun extractProgress(title: String, text: String, extras: Bundle): Int {
+        // 优先使用 MiuiDownloadManager 的字节数计算精确进度
+        val current = extras.getLong("extra_download_current_bytes", -1L)
+        val total   = extras.getLong("extra_download_total_bytes",   -1L)
+        if (current >= 0 && total > 0) return ((current * 100) / total).toInt().coerceIn(0, 100)
+
+        // 通用字段降级
         extras.getInt("progress", -1).takeIf { it >= 0 }?.let { return it }
         extras.getInt("android.progress", -1).takeIf { it >= 0 }?.let { return it }
         extras.getInt("percent", -1).takeIf { it >= 0 }?.let { return it }
@@ -223,12 +251,27 @@ class DownloadHook : IXposedHookLoadPackage {
     }
 
     private fun extractDownloadId(extras: Bundle): Long {
-        for (key in listOf("android.downloadId", "downloadId", "extra_download_id", "notification_id")) {
-            val id = extras.getLong(key, -1L)
-            if (id > 0) return id
+        // MiuiDownloadManager.EXTRA_DOWNLOAD_ID（最高优先）
+        extras.getLong("extra_download_id", -1L).takeIf { it > 0 }?.let { return it }
+        extras.getInt("extra_download_id", -1).takeIf { it > 0 }?.let { return it.toLong() }
+
+        // 通用降级
+        for (key in listOf("android.downloadId", "downloadId", "notification_id")) {
+            extras.getLong(key, -1L).takeIf { it > 0 }?.let { return it }
         }
         val intId = extras.getInt("android.downloadId", -1)
         return if (intId > 0) intId.toLong() else -1L
+    }
+
+    /** 从 AOSP tag 格式（如 "2162:2163:" 或 "downloading://2162"）提取第一个 ID */
+    private fun extractIdFromTag(tag: String?): Long {
+        if (tag.isNullOrEmpty()) return -1L
+        // 尝试直接解析（tag 本身就是数字）
+        tag.toLongOrNull()?.takeIf { it > 0 }?.let { return it }
+        // 匹配 tag 里第一个数字序列
+        val m = Pattern.compile("(\\d{3,})").matcher(tag)
+        if (m.find()) return m.group(1)?.toLongOrNull() ?: -1L
+        return -1L
     }
 
     private fun extractFileName(title: String, text: String, extras: Bundle): String {
