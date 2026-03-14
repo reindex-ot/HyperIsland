@@ -6,3 +6,8 @@
 
 # Keep all Xposed module classes
 -keep class com.example.hyperisland.xposed.** { *; }
+
+# Keep isModuleActive so LSPosed can hook it by name in release builds
+-keepclassmembers class com.example.hyperisland.MainActivity {
+    public boolean isModuleActive();
+}

@@ -52,6 +52,12 @@
             android:name="xposedscope"
             android:value="com.example.hyperisland;com.android.providers.downloads;com.xiaomi.android.app.downloadmanager" />
 
+        <!-- 设置 Provider，供 Xposed Hook 进程跨进程读取 -->
+        <provider
+            android:name=".SettingsProvider"
+            android:authorities="com.example.hyperisland.settings"
+            android:exported="true" />
+
         <!-- 下载控制接收器 -->
         <receiver
             android:name=".xposed.DownloadControlReceiver"

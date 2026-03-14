@@ -136,6 +136,7 @@ class DownloadHook : IXposedHookLoadPackage {
                         XposedBridge.log("HyperIsland: [Builder] $appName | $fileName | $progress% | id=$downloadId")
 
                         val context = getContext(lpparam) ?: return
+                        InProcessController.ensureRegistered(context)
                         DownloadIslandNotification.inject(context, extras, title, text, progress, appName, fileName, downloadId, lpparam.packageName)
                         // 不在此处设置 hyperisland_processed，让 Notify hook 继续运行设置 notif.actions
                     }

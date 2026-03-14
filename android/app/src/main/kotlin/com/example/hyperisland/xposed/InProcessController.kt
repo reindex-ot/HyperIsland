@@ -49,6 +49,9 @@ object InProcessController {
 
     @Volatile private var registered = false
 
+    /** 从 ContentProvider 加载的设置，在 ensureRegistered 时初始化 */
+    @Volatile private var resumeNotificationEnabled = true
+
     /** 下载通知快照，供暂停后重建覆盖通知 */
     data class DownloadNotifSnapshot(
         val notifId: Int,
@@ -69,9 +72,18 @@ object InProcessController {
 
     // ── 初始化：注册进程内 Receiver ────────────────────────────────────────────
 
+    /** 从 ContentProvider 加载所有设置，进程首次初始化时调用一次 */
+    private fun loadSettings(context: Context) {
+        resumeNotificationEnabled = readBooleanSetting(context, "pref_resume_notification", true)
+        XposedBridge.log("HyperIsland: settings loaded — resumeNotification=$resumeNotificationEnabled")
+    }
+
     fun ensureRegistered(context: Context) {
         if (registered) return
         val appCtx = context.applicationContext ?: context
+
+        // 读取设置（进程首次初始化时）
+        loadSettings(appCtx)
 
         // 打印当前进程的 DownloadManager 实际类型，方便调试
         runCatching {
@@ -362,6 +374,10 @@ object InProcessController {
     // ── 暂停覆盖通知 ──────────────────────────────────────────────────────────
 
     private fun postPausedOverlay(context: Context, isAll: Boolean) {
+        if (!resumeNotificationEnabled) {
+            XposedBridge.log("HyperIsland: postPausedOverlay — disabled by setting")
+            return
+        }
         val snap = lastDownloadSnapshot ?: run {
             XposedBridge.log("HyperIsland: postPausedOverlay — no snapshot")
             return
@@ -427,6 +443,18 @@ object InProcessController {
             XposedBridge.log("HyperIsland: cancelPausedOverlay")
         } catch (e: Exception) {
             XposedBridge.log("HyperIsland: cancelPausedOverlay failed: ${e.message}")
+        }
+    }
+
+    /** 通过模块 ContentProvider 查询布尔设置，默认值 [default] */
+    private fun readBooleanSetting(context: Context, key: String, default: Boolean): Boolean {
+        return try {
+            val uri = android.net.Uri.parse("content://com.example.hyperisland.settings/$key")
+            val cursor = context.contentResolver.query(uri, null, null, null, null)
+            cursor?.use { if (it.moveToFirst()) it.getInt(0) != 0 else default } ?: default
+        } catch (e: Exception) {
+            XposedBridge.log("HyperIsland: readBooleanSetting($key) failed: ${e.message}")
+            default
         }
     }
 

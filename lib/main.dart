@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
 
 void main() {
@@ -474,7 +475,7 @@ class _NotesCard extends StatelessWidget {
     final items = [
       '此页面仅用于测试是否支持超级岛，并不代表实际效果',
       '请在 HyperCeiler 中关闭系统界面和小米服务框架的焦点通知白名单',
-      '实际使用请在 LSPosed 管理器中激活，转到应用商店/下载管理使用',
+      '实际使用请在 LSPosed 管理器中激活，并重启作用域，转到应用商店/下载管理使用',
     ];
 
     return Card(
@@ -533,8 +534,46 @@ class _SectionLabel extends StatelessWidget {
 // Settings Page
 // ─────────────────────────────────────────────
 
-class SettingsPage extends StatelessWidget {
+const kPrefResumeNotification = 'pref_resume_notification';
+
+class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
+
+  @override
+  State<SettingsPage> createState() => _SettingsPageState();
+}
+
+class _SettingsPageState extends State<SettingsPage> {
+  bool _resumeNotification = true;
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _resumeNotification = prefs.getBool(kPrefResumeNotification) ?? true;
+      _loading = false;
+    });
+  }
+
+  Future<void> _setResumeNotification(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(kPrefResumeNotification, value);
+    setState(() => _resumeNotification = value);
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('请重启作用域应用以使设置生效'),
+          duration: Duration(seconds: 4),
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -548,24 +587,37 @@ class SettingsPage extends StatelessWidget {
             backgroundColor: cs.surface,
             centerTitle: false,
           ),
-          SliverFillRemaining(
-            child: Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.construction_outlined,
-                      size: 64, color: cs.onSurfaceVariant.withValues(alpha: 0.4)),
-                  const SizedBox(height: 16),
-                  Text(
-                    '暂无设置',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: cs.onSurfaceVariant.withValues(alpha: 0.6),
-                        ),
+          if (_loading)
+            const SliverFillRemaining(
+              child: Center(child: CircularProgressIndicator()),
+            )
+          else
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              sliver: SliverList(
+                delegate: SliverChildListDelegate([
+                  _SectionLabel('下载行为'),
+                  const SizedBox(height: 8),
+                  Card(
+                    elevation: 0,
+                    color: cs.surfaceContainerHighest,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16)),
+                    child: SwitchListTile(
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 4),
+                      title: const Text('暂停后保留焦点通知'),
+                      subtitle: const Text('显示一条通知，点击以继续下载，可能导致状态不同步'),
+                      value: _resumeNotification,
+                      onChanged: _setResumeNotification,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16)),
+                    ),
                   ),
-                ],
+                  const SizedBox(height: 24),
+                ]),
               ),
             ),
-          ),
         ],
       ),
     );
