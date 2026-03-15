@@ -3,6 +3,7 @@ package com.example.hyperisland.xposed
 import android.app.Notification
 import android.service.notification.StatusBarNotification
 import com.example.hyperisland.xposed.templates.GenericProgressIslandNotification
+import com.example.hyperisland.xposed.templates.NotificationIslandNotification
 import de.robv.android.xposed.IXposedHookLoadPackage
 import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.XposedBridge
@@ -82,12 +83,12 @@ class GenericProgressHook : IXposedHookLoadPackage {
                 val template = context.contentResolver
                     .query(uri, null, null, null, null)
                     ?.use { if (it.moveToFirst()) it.getString(0).takeIf { s -> s.isNotBlank() } else null }
-                    ?: GenericProgressIslandNotification.id
+                    ?: NotificationIslandNotification.TEMPLATE_ID
                 cachedTemplates[cacheKey] = template
                 template
             } catch (e: Exception) {
                 XposedBridge.log("HyperIsland[Generic]: loadChannelTemplate failed: ${e.message}")
-                GenericProgressIslandNotification.id
+                NotificationIslandNotification.TEMPLATE_ID
             }
         }
 

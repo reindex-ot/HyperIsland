@@ -431,7 +431,7 @@ class _ChannelTile extends StatelessWidget {
                     children: [
                       Expanded(
                         child: _OptionRow(
-                          label: '图标',
+                          label: '图标样式',
                           value: iconMode,
                           options: const {
                             kIconModeAuto: '自动',

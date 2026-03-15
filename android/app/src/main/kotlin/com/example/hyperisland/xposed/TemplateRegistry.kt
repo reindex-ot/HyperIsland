@@ -3,6 +3,7 @@ package com.example.hyperisland.xposed
 import android.content.Context
 import android.os.Bundle
 import com.example.hyperisland.xposed.templates.GenericProgressIslandNotification
+import com.example.hyperisland.xposed.templates.NotificationIslandNotification
 import de.robv.android.xposed.XposedBridge
 
 /**
@@ -17,6 +18,7 @@ object TemplateRegistry {
 
     private val registry: Map<String, IslandTemplate> = listOf<IslandTemplate>(
         GenericProgressIslandNotification,
+        NotificationIslandNotification,
     ).associateBy { it.id }
 
     /** 返回所有已注册模板的元数据，与 [registeredTemplates] 来源相同。 */

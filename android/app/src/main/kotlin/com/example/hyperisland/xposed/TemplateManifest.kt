@@ -1,6 +1,7 @@
 package com.example.hyperisland.xposed
 
 import com.example.hyperisland.xposed.templates.GenericProgressIslandNotification
+import com.example.hyperisland.xposed.templates.NotificationIslandNotification
 
 /**
  * 可供 Flutter 读取的模板元数据列表（无 Xposed 依赖）。
@@ -12,5 +13,9 @@ val registeredTemplates: List<Map<String, String>> = listOf(
     mapOf(
         "id"   to GenericProgressIslandNotification.TEMPLATE_ID,
         "name" to GenericProgressIslandNotification.TEMPLATE_NAME,
+    ),
+    mapOf(
+        "id"   to NotificationIslandNotification.TEMPLATE_ID,
+        "name" to NotificationIslandNotification.TEMPLATE_NAME,
     ),
 )
