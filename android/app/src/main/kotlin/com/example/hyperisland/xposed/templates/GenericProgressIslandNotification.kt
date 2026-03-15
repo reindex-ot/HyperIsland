@@ -6,6 +6,7 @@ import android.graphics.drawable.Icon
 import android.os.Bundle
 import com.example.hyperisland.xposed.IslandTemplate
 import com.example.hyperisland.xposed.NotifData
+import com.example.hyperisland.xposed.toRounded
 import com.xzakota.hyper.notification.focus.FocusNotification
 import de.robv.android.xposed.XposedBridge
 
@@ -149,7 +150,7 @@ object GenericProgressIslandNotification : IslandTemplate {
                 "notif_large" -> largeIcon ?: notifIcon ?: fallbackIcon
                 "app_icon"    -> appIconRaw ?: fallbackIcon
                 else          -> notifIcon ?: largeIcon ?: fallbackIcon  // auto
-            }
+            }.toRounded(context)
 
             val resolvedFirstFloat  = when (firstFloat)      { "on" -> true; "off" -> false; else -> false }
             val resolvedEnableFloat = when (enableFloatMode)  { "on" -> true; "off" -> false; else -> false }
@@ -161,7 +162,7 @@ object GenericProgressIslandNotification : IslandTemplate {
                 islandFirstFloat   = resolvedFirstFloat
                 enableFloat        = resolvedEnableFloat
                 updatable          = !isComplete && !isPaused
-
+                isShowNotification = focusNotificaiton
                 ticker = title
                 island{
                     islandProperty = 1
@@ -211,7 +212,7 @@ object GenericProgressIslandNotification : IslandTemplate {
                 }
 
 
-                if (focusNotificaiton) iconTextInfo {
+                iconTextInfo {
                     this.title = title
                     content    = displayContent
                     animIconInfo {

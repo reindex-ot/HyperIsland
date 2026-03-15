@@ -6,6 +6,7 @@ import android.graphics.drawable.Icon
 import android.os.Bundle
 import com.example.hyperisland.xposed.IslandTemplate
 import com.example.hyperisland.xposed.NotifData
+import com.example.hyperisland.xposed.toRounded
 import com.xzakota.hyper.notification.focus.FocusNotification
 import de.robv.android.xposed.XposedBridge
 
@@ -54,8 +55,9 @@ object NotificationIslandNotification : IslandTemplate {
         timeoutSecs: Int,
     ) {
         try {
-            val displayIcon = largeIcon ?: notifIcon ?: appIconRaw
-                ?: Icon.createWithResource(context, android.R.drawable.ic_dialog_info)
+            val displayIcon = (largeIcon ?: notifIcon ?: appIconRaw
+                ?: Icon.createWithResource(context, android.R.drawable.ic_dialog_info))
+                .toRounded(context)
 
             val leftText       = title
             val rightContent   = subtitle.ifEmpty { title }
@@ -73,7 +75,7 @@ object NotificationIslandNotification : IslandTemplate {
                     enableFloat = (enableFloatMode == "on")
                 }
                 updatable        = true
-                isShowNotification = false
+                isShowNotification = focusNotificaiton
                 ticker = title
                 island {
                     islandProperty = 1
@@ -105,7 +107,7 @@ object NotificationIslandNotification : IslandTemplate {
                     }
                 }
 
-                if (focusNotificaiton) iconTextInfo {
+                iconTextInfo {
                     this.title = title
                     content    = displayContent
                     animIconInfo {
@@ -115,7 +117,7 @@ object NotificationIslandNotification : IslandTemplate {
                 }
 
                 val effectiveActions = actions.take(2)
-                if (effectiveActions.isNotEmpty() && focusNotificaiton) {
+                if (effectiveActions.isNotEmpty()) {
                     textButton {
                         effectiveActions.forEachIndexed { index, action ->
                             addActionInfo {
