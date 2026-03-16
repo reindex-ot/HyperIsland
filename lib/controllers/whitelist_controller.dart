@@ -52,8 +52,6 @@ class ChannelInfo {
 
 class WhitelistController extends ChangeNotifier {
   List<AppInfo> _allApps = [];
-  // 排好序的稳定列表，仅在 _load() 时重新排序，切换开关不改变顺序。
-  List<AppInfo> _sortedApps = [];
   Set<String> enabledPackages = {};
   bool loading = true;
   String _searchQuery = '';
@@ -65,15 +63,21 @@ class WhitelistController extends ChangeNotifier {
 
   List<AppInfo> get filteredApps {
     final q = _searchQuery.toLowerCase();
-    final source = showSystemApps
-        ? _sortedApps
-        : _sortedApps.where((a) => !a.isSystem || enabledPackages.contains(a.packageName)).toList();
-    if (q.isEmpty) return source is List<AppInfo> ? source : source.toList();
-    return source
-        .where((a) =>
-            a.appName.toLowerCase().contains(q) ||
-            a.packageName.toLowerCase().contains(q))
-        .toList();
+    Iterable<AppInfo> source = showSystemApps
+        ? _allApps
+        : _allApps.where((a) => !a.isSystem || enabledPackages.contains(a.packageName));
+    if (q.isNotEmpty) {
+      source = source.where((a) =>
+          a.appName.toLowerCase().contains(q) ||
+          a.packageName.toLowerCase().contains(q));
+    }
+    return List<AppInfo>.from(source)
+      ..sort((a, b) {
+        final aOn = enabledPackages.contains(a.packageName);
+        final bOn = enabledPackages.contains(b.packageName);
+        if (aOn != bOn) return aOn ? -1 : 1;
+        return a.appName.compareTo(b.appName);
+      });
   }
 
   Future<void> refresh() => _load();
@@ -101,14 +105,6 @@ class WhitelistController extends ChangeNotifier {
         );
       }).toList();
 
-      // 加载完成后按「已启用优先，组内字母序」排序，后续切换开关不重新排序。
-      _sortedApps = List<AppInfo>.from(_allApps)
-        ..sort((a, b) {
-          final aOn = enabledPackages.contains(a.packageName);
-          final bOn = enabledPackages.contains(b.packageName);
-          if (aOn != bOn) return aOn ? -1 : 1;
-          return a.appName.compareTo(b.appName);
-        });
     } catch (e) {
       debugPrint('WhitelistController._load error: $e');
     }
