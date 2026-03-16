@@ -210,18 +210,18 @@ object GenericProgressIslandNotification : IslandTemplate {
                         }
                     }
                     smallIslandArea {
-//                        combinePicInfo
-//                        {
+                        combinePicInfo
+                        {
                             picInfo {
                                 type = 1
                                 pic  = islandIconKey
                             }
-//                            if (!isComplete && !isPaused && !isWaiting) {
-//                                progressInfo {
-//                                    this.progress = progress
-//                                }
-//                            }
-//                        }
+                            if (!isComplete && progress > 0) {
+                                progressInfo {
+                                    this.progress = progress
+                                }
+                            }
+                        }
                     }
                 }
 
