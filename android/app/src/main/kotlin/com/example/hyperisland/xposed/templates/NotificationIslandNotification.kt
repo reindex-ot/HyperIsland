@@ -51,7 +51,7 @@ object NotificationIslandNotification : IslandTemplate {
         notifIcon: Icon?,
         largeIcon: Icon?,
         appIconRaw: Icon?,
-        iconMode: Icon?,
+        iconMode: String?,
         focusNotif: String,
         firstFloat: String,
         enableFloatMode: String,
