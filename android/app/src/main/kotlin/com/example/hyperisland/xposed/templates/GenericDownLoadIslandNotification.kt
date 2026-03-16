@@ -245,8 +245,10 @@ object GenericProgressIslandNotification : IslandTemplate {
             extras.putAll(resourceBundle)
             // HyperOS 从 extras 顶层查找 action，将嵌套 bundle 展开
             flattenActionsToExtras(resourceBundle, extras)
-            // 保持 updatable 与原始逻辑一致（完成或暂停时不可更新）
-            val jsonParam = injectUpdatable(builder.buildJsonParam(), !isComplete && !isPaused)
+            // 修正字段名 + 保持 updatable 与原始逻辑一致
+            val jsonParam = injectUpdatable(
+                fixTextButtonJson(builder.buildJsonParam()), !isComplete && !isPaused
+            )
             extras.putString("miui.focus.param", jsonParam)
 
             val stateTag = when {
@@ -260,6 +262,26 @@ object GenericProgressIslandNotification : IslandTemplate {
         } catch (e: Exception) {
             XposedBridge.log("HyperIsland[Generic]: Island injection error: ${e.message}")
         }
+    }
+
+    /**
+     * 将 textButton 数组里新库输出的 "actionIntent"+"actionIntentType"
+     * 替换为 HyperOS V3 协议所需的 "action" 字段，否则按钮点击无响应。
+     */
+    private fun fixTextButtonJson(jsonParam: String): String {
+        return try {
+            val json = org.json.JSONObject(jsonParam)
+            val pv2  = json.optJSONObject("param_v2") ?: return jsonParam
+            val btns = pv2.optJSONArray("textButton") ?: return jsonParam
+            for (i in 0 until btns.length()) {
+                val btn = btns.getJSONObject(i)
+                val key = btn.optString("actionIntent").takeIf { it.isNotEmpty() } ?: continue
+                btn.put("action", key)
+                btn.remove("actionIntent")
+                btn.remove("actionIntentType")
+            }
+            json.toString()
+        } catch (_: Exception) { jsonParam }
     }
 
     private fun injectUpdatable(jsonParam: String, updatable: Boolean): String {

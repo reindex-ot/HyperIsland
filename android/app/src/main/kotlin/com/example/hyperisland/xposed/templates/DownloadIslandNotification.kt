@@ -170,15 +170,15 @@ object DownloadIslandNotification {
                 isWaiting  -> "等待中"
                 else       -> if (progress >= 0) "下载中 $progress%" else "下载中"
             }
-            val baseJson  = builder.buildJsonParam()
+            // 修正 textButton 字段名 + 注入 aodTitle/updatable
             val finalJson = try {
-                val json = org.json.JSONObject(baseJson)
+                val json = org.json.JSONObject(fixTextButtonJson(builder.buildJsonParam()))
                 val pv2  = json.optJSONObject("param_v2") ?: org.json.JSONObject()
                 pv2.put("aodTitle", aodTitle)
                 pv2.put("updatable", !isComplete)
                 json.put("param_v2", pv2)
                 json.toString()
-            } catch (_: Exception) { baseJson }
+            } catch (_: Exception) { builder.buildJsonParam() }
             extras.putString("miui.focus.param", finalJson)
 
             val stateTag = when {
@@ -192,6 +192,26 @@ object DownloadIslandNotification {
         } catch (e: Exception) {
             XposedBridge.log("HyperIsland[Download]: Island injection error: ${e.message}")
         }
+    }
+
+    /**
+     * 将 textButton 数组里新库输出的 "actionIntent"+"actionIntentType"
+     * 替换为 HyperOS V3 协议所需的 "action" 字段，否则按钮点击无响应。
+     */
+    private fun fixTextButtonJson(jsonParam: String): String {
+        return try {
+            val json = org.json.JSONObject(jsonParam)
+            val pv2  = json.optJSONObject("param_v2") ?: return jsonParam
+            val btns = pv2.optJSONArray("textButton") ?: return jsonParam
+            for (i in 0 until btns.length()) {
+                val btn = btns.getJSONObject(i)
+                val key = btn.optString("actionIntent").takeIf { it.isNotEmpty() } ?: continue
+                btn.put("action", key)
+                btn.remove("actionIntent")
+                btn.remove("actionIntentType")
+            }
+            json.toString()
+        } catch (_: Exception) { jsonParam }
     }
 
     /** 将 buildResourceBundle() 里嵌套的 "miui.focus.actions" 展开到 extras 顶层 */

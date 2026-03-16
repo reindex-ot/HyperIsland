@@ -144,7 +144,8 @@ object NotificationIslandNotification : IslandTemplate {
             extras.putAll(resourceBundle)
             // HyperOS 从 extras 顶层查找 action，将嵌套 bundle 展开
             flattenActionsToExtras(resourceBundle, extras)
-            extras.putString("miui.focus.param", builder.buildJsonParam())
+            // 修正 textButton 字段名：新库输出 "actionIntent"，HyperOS V3 协议只认 "action"
+            extras.putString("miui.focus.param", fixTextButtonJson(builder.buildJsonParam()))
 
             XposedBridge.log(
                 "HyperIsland[NotifIsland]: Island injected — $title | left=$leftText | right=$rightContent | buttons=${actions.size} | isOngoing=${isOngoing}"
@@ -153,6 +154,26 @@ object NotificationIslandNotification : IslandTemplate {
         } catch (e: Exception) {
             XposedBridge.log("HyperIsland[NotifIsland]: Island injection error: ${e.message}")
         }
+    }
+
+    /**
+     * 将 textButton 数组里新库输出的 "actionIntent"+"actionIntentType"
+     * 替换为 HyperOS V3 协议所需的 "action" 字段，否则按钮点击无响应。
+     */
+    private fun fixTextButtonJson(jsonParam: String): String {
+        return try {
+            val json = org.json.JSONObject(jsonParam)
+            val pv2  = json.optJSONObject("param_v2") ?: return jsonParam
+            val btns = pv2.optJSONArray("textButton") ?: return jsonParam
+            for (i in 0 until btns.length()) {
+                val btn = btns.getJSONObject(i)
+                val key = btn.optString("actionIntent").takeIf { it.isNotEmpty() } ?: continue
+                btn.put("action", key)
+                btn.remove("actionIntent")
+                btn.remove("actionIntentType")
+            }
+            json.toString()
+        } catch (_: Exception) { jsonParam }
     }
 
     /** 将 buildResourceBundle() 里嵌套的 "miui.focus.actions" 展开到 extras 顶层 */
