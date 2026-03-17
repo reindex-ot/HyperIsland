@@ -35,10 +35,12 @@ jobs:
           # 格式：versionName+versionCode
           VERSION_NAME=$(echo "$CURRENT" | cut -d'+' -f1)
           VERSION_CODE=$(echo "$CURRENT" | cut -d'+' -f2)
+          PREVIOUS_VERSION_NAME=$(echo "$PREVIOUS" | cut -d'+' -f1)
 
           # 将版本信息输出到 GitHub Actions 环境变量，供后续步骤使用
           echo "version_name=$VERSION_NAME" >> $GITHUB_OUTPUT
           echo "version_code=$VERSION_CODE"  >> $GITHUB_OUTPUT
+          echo "previous_version=$PREVIOUS_VERSION_NAME" >> $GITHUB_OUTPUT
 
           # 判断版本是否变更
           if [ "$CURRENT" != "$PREVIOUS" ] && [ -n "$CURRENT" ]; then
@@ -115,7 +117,42 @@ jobs:
           cp build/app/outputs/flutter-apk/app-release.apk \
             "HyperIsland-v${{ steps.version.outputs.version_name }}.apk"
 
-      # 第九步：创建 GitHub Release（仅在版本变更时执行）
+      # 第九步：提取更新日志（仅在版本变更时执行）
+      # 优先从 CHANGELOG.md 中提取，如果没有则从 git 记录生成
+      - name: Extract changelog
+        if: steps.version.outputs.changed == 'true'
+        id: changelog
+        run: |
+          VERSION="${{ steps.version.outputs.version_name }}"
+          PREVIOUS_VERSION="${{ steps.version.outputs.previous_version }}"
+
+          # 尝试从 CHANGELOG.md 中提取版本日志
+          if grep -q "^## \[$VERSION\]" CHANGELOG.md; then
+            # 提取版本对应的更新日志内容
+            # 从 ## [版本号] 开始，到下一个 ## 或文件末尾
+            awk "/^## \[$VERSION\]/,/^## \[/ {print}" CHANGELOG.md | sed '$d' > changelog_content.txt
+          else
+            # 如果 CHANGELOG.md 中没有该版本，从 git 记录生成
+            echo "## HyperIsland v$VERSION" > changelog_content.txt
+            echo "" >> changelog_content.txt
+            echo "### 变更日志" >> changelog_content.txt
+            echo "" >> changelog_content.txt
+
+            # 获取上一个版本的 tag，如果没有则使用最早的提交
+            if [ -n "$PREVIOUS_VERSION" ] && git rev-parse "v$PREVIOUS_VERSION" >/dev/null 2>&1; then
+              git log "v$PREVIOUS_VERSION"..HEAD --pretty=format:"- %s" >> changelog_content.txt
+            else
+              git log --pretty=format:"- %s" -20 >> changelog_content.txt
+            fi
+          fi
+
+          # 将多行内容转换为环保的格式
+          CHANGELOG=$(cat changelog_content.txt)
+          echo "content<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGELOG" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      # 第十步：创建 GitHub Release（仅在版本变更时执行）
       # 在 GitHub 的 Releases 页面创建新版本发布
       # 包含版本标签、发布说明和 APK 文件下载链接
       - name: Create GitHub Release
@@ -126,11 +163,8 @@ jobs:
           tag_name: v${{ steps.version.outputs.version_name }}
           # Release 标题
           name: HyperIsland v${{ steps.version.outputs.version_name }}
-          # Release 描述信息
-          body: |
-            ## HyperIsland v${{ steps.version.outputs.version_name }}
-
-            - versionCode: `${{ steps.version.outputs.version_code }}`
+          # Release 描述信息（包含更新日志）
+          body: ${{ steps.changelog.outputs.content }}
           # 要上传到 Release 的文件
           files: HyperIsland-v${{ steps.version.outputs.version_name }}.apk
           # 不作为草稿发布（直接发布）
