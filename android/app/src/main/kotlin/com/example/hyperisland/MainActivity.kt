@@ -28,9 +28,18 @@ class MainActivity : FlutterActivity() {
     private var pendingAppsResult: MethodChannel.Result? = null
     private var pendingAppsIncludeSystem: Boolean = false
 
+    private var pendingStartupNotification: Boolean = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         checkAndRequestNotificationPermission()
+        if (isModuleActive()) {
+            if (checkNotificationPermission()) {
+                HyperIslandHelper.sendIslandNotification(this, "HyperIsland", "模块已激活")
+            } else {
+                pendingStartupNotification = true
+            }
+        }
     }
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
@@ -38,49 +47,9 @@ class MainActivity : FlutterActivity() {
 
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL).setMethodCallHandler { call, result ->
             when (call.method) {
-                "showProgress" -> {
+                "showTest" -> {
                     if (checkNotificationPermission()) {
-                        handleShowProgress(call, result)
-                    } else {
-                        pendingResult = result
-                        pendingCall = call
-                        requestNotificationPermission()
-                    }
-                }
-
-                "showComplete" -> {
-                    if (checkNotificationPermission()) {
-                        handleShowComplete(call, result)
-                    } else {
-                        pendingResult = result
-                        pendingCall = call
-                        requestNotificationPermission()
-                    }
-                }
-
-                "showFailed" -> {
-                    if (checkNotificationPermission()) {
-                        handleShowFailed(call, result)
-                    } else {
-                        pendingResult = result
-                        pendingCall = call
-                        requestNotificationPermission()
-                    }
-                }
-
-                "showIndeterminate" -> {
-                    if (checkNotificationPermission()) {
-                        handleShowIndeterminate(call, result)
-                    } else {
-                        pendingResult = result
-                        pendingCall = call
-                        requestNotificationPermission()
-                    }
-                }
-
-                "showCustom" -> {
-                    if (checkNotificationPermission()) {
-                        handleShowCustom(call, result)
+                        handleShowTest(result)
                     } else {
                         pendingResult = result
                         pendingCall = call
@@ -499,18 +468,18 @@ class MainActivity : FlutterActivity() {
         if (requestCode == REQUEST_NOTIFICATION_PERMISSION) {
             val granted = grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED
 
-            if (granted && pendingCall != null && pendingResult != null) {
-                // 重新执行被挂起的调用
-                when (pendingCall!!.method) {
-                    "showProgress" -> handleShowProgress(pendingCall!!, pendingResult!!)
-                    "showComplete" -> handleShowComplete(pendingCall!!, pendingResult!!)
-                    "showFailed" -> handleShowFailed(pendingCall!!, pendingResult!!)
-                    "showIndeterminate" -> handleShowIndeterminate(pendingCall!!, pendingResult!!)
-                    "showCustom" -> handleShowCustom(pendingCall!!, pendingResult!!)
+            if (granted) {
+                if (pendingStartupNotification) {
+                    pendingStartupNotification = false
+                    HyperIslandHelper.sendIslandNotification(this, "HyperIsland", "模块已激活")
                 }
-                pendingResult = null
-                pendingCall = null
-            } else if (!granted) {
+                if (pendingCall != null && pendingResult != null) {
+                    handleShowTest(pendingResult!!)
+                    pendingResult = null
+                    pendingCall = null
+                }
+            } else {
+                pendingStartupNotification = false
                 pendingResult?.success(false)
                 pendingResult = null
                 pendingCall = null
@@ -519,99 +488,16 @@ class MainActivity : FlutterActivity() {
         }
     }
 
-    private fun handleShowProgress(call: MethodCall, result: MethodChannel.Result) {
+    private fun handleShowTest(result: MethodChannel.Result) {
         try {
-            val title = call.argument<String>("title") ?: "下载中"
-            val fileName = call.argument<String>("fileName") ?: ""
-            val progress = call.argument<Int>("progress") ?: 0
-            val speed = call.argument<String>("speed") ?: ""
-            val remainingTime = call.argument<String>("remainingTime") ?: ""
-
-            val success = HyperIslandHelper.showDownloadProgress(
+            val success = HyperIslandHelper.sendIslandNotification(
                 this,
-                title,
-                fileName,
-                progress,
-                speed,
-                remainingTime
+                "HyperIsland",
+                "测试超级岛通知"
             )
             result.success(success)
         } catch (e: Exception) {
-            Log.e(TAG, "Error showing progress", e)
-            result.error("ERROR", e.message, null)
-        }
-    }
-
-    private fun handleShowComplete(call: MethodCall, result: MethodChannel.Result) {
-        try {
-            val title = call.argument<String>("title") ?: "下载完成"
-            val fileName = call.argument<String>("fileName") ?: ""
-
-            val success = HyperIslandHelper.showDownloadComplete(
-                this,
-                title,
-                fileName
-            )
-            result.success(success)
-        } catch (e: Exception) {
-            Log.e(TAG, "Error showing complete", e)
-            result.error("ERROR", e.message, null)
-        }
-    }
-
-    private fun handleShowFailed(call: MethodCall, result: MethodChannel.Result) {
-        try {
-            val title = call.argument<String>("title") ?: "下载失败"
-            val fileName = call.argument<String>("fileName") ?: ""
-            val error = call.argument<String>("error") ?: ""
-
-            val success = HyperIslandHelper.showDownloadFailed(
-                this,
-                title,
-                fileName,
-                error
-            )
-            result.success(success)
-        } catch (e: Exception) {
-            Log.e(TAG, "Error showing failed", e)
-            result.error("ERROR", e.message, null)
-        }
-    }
-
-    private fun handleShowIndeterminate(call: MethodCall, result: MethodChannel.Result) {
-        try {
-            val title = call.argument<String>("title") ?: ""
-            val content = call.argument<String>("content") ?: ""
-
-            val success = HyperIslandHelper.showIndeterminateProgress(
-                this,
-                title,
-                content
-            )
-            result.success(success)
-        } catch (e: Exception) {
-            Log.e(TAG, "Error showing indeterminate", e)
-            result.error("ERROR", e.message, null)
-        }
-    }
-
-    private fun handleShowCustom(call: MethodCall, result: MethodChannel.Result) {
-        try {
-            val type = call.argument<String>("type") ?: "custom"
-            val title = call.argument<String>("title") ?: ""
-            val content = call.argument<String>("content") ?: ""
-            val icon = call.argument<String>("icon")
-
-            val success = HyperIslandHelper.showCustomFocus(
-                this,
-                type,
-                title,
-                content,
-                icon
-            )
-            result.success(success)
-        } catch (e: Exception) {
-            Log.e(TAG, "Error showing custom", e)
+            Log.e(TAG, "Error showing test notification", e)
             result.error("ERROR", e.message, null)
         }
     }
