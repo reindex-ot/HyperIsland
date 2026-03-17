@@ -75,7 +75,7 @@ jobs:
       # 将 base64 编码的密钥文件解码为 .jks 文件
       - name: Decode keystore
         run: |
-          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > release.jks
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > android/app/release.jks
 
       # 第六步：编译 APK
       # 使用 release 模式编译（包含代码混淆和资源压缩）
