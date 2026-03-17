@@ -28,7 +28,7 @@ jobs:
       # 第一步：检出代码
       # fetch-depth: 2 表示获取最近 2 个提交的历史（用于版本对比）
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
         with:
           fetch-depth: 2
 
@@ -85,7 +85,7 @@ jobs:
       # 第三步：安装 Java 环境
       # Flutter 编译 Android 需要 Java 17
       - name: Set up Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v4.3.0
         with:
           java-version: '17'
           distribution: 'temurin'
@@ -94,7 +94,7 @@ jobs:
       # 使用稳定版本的 Flutter
       # 启用缓存加速下载
       - name: Set up Flutter
-        uses: subosito/flutter-action@v2
+        uses: subosito/flutter-action@v2.16.0
         with:
           channel: 'stable'
           cache: true
@@ -102,7 +102,7 @@ jobs:
       # 第五步：缓存 Pub 依赖
       # 使用 pubspec.lock 作为 key，依赖变更时自动失效缓存
       - name: Cache Pub dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v4.1.2
         with:
           path: |
             ${{ env.PUB_CACHE }}
@@ -114,7 +114,7 @@ jobs:
       # 第六步：缓存 Gradle
       # 缓存 Gradle 依赖和构建缓存，加快编译速度
       - name: Cache Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v4.1.0
 
       # 第七步：安装 Flutter 依赖
       # 执行 flutter pub get 下载 pubspec.yaml 中定义的所有依赖包
@@ -153,12 +153,12 @@ jobs:
       # 可在 Actions 页面的 "Artifacts" 部分下载
       # 禁用压缩，确保下载时直接是 APK 格式
       - name: Upload APK as artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v4.6.0
         with:
           name: HyperIsland-v${{ steps.version.outputs.version_name }}
           path: build/app/outputs/flutter-apk/app-release.apk
           retention-days: 30
-          compression: none
+          compression-level: 0
 
       # 第十一步：重命名 APK 文件（仅在版本变更时执行）
       # 将编译输出的 app-release.apk 重命名为 HyperIsland-v1.5.0.apk
@@ -179,18 +179,18 @@ jobs:
           PREVIOUS_VERSION="${{ steps.version.outputs.previous_version }}"
 
           # 尝试从 CHANGELOG.md 中提取版本日志
-          if grep -q "^## \[$VERSION\]" CHANGELOG.md; then
-            # 提取版本对应的更新日志内容
-            # 从 ## [版本号] 开始，到下一个 ## 或文件末尾
-            awk "/^## \[$VERSION\]/,/^## \[/ {print}" CHANGELOG.md | sed '$d' > changelog_content.txt
+          if [ -f CHANGELOG.md ] && grep -q "^## \[$VERSION\]" CHANGELOG.md; then
+            # 提取从 ## [版本号] 开始到下一个 ## 或文件末尾的内容
+            awk "/^## \[$VERSION\]/,/^## \[/ {print}" CHANGELOG.md | head -n -1 > changelog_content.txt
+
+            # 移除第一行标题，只保留内容
+            tail -n +2 changelog_content.txt > changelog_content_tmp.txt
+            mv changelog_content_tmp.txt changelog_content.txt
           else
-            # 如果 CHANGELOG.md 中没有该版本，从 git 记录生成
-            echo "## HyperIsland v$VERSION" > changelog_content.txt
-            echo "" >> changelog_content.txt
-            echo "### 变更日志" >> changelog_content.txt
+            # 版本不存在或没有 CHANGELOG.md，从 git 记录生成
+            echo "### 变更日志" > changelog_content.txt
             echo "" >> changelog_content.txt
 
-            # 获取上一个版本的 tag，如果没有则使用最早的提交
             if [ -n "$PREVIOUS_VERSION" ] && git rev-parse "v$PREVIOUS_VERSION" >/dev/null 2>&1; then
               git log "v$PREVIOUS_VERSION"..HEAD --pretty=format:"- %s" >> changelog_content.txt
             else
@@ -198,7 +198,7 @@ jobs:
             fi
           fi
 
-          # 将多行内容转换为环保的格式
+          # 将多行内容转换为 GitHub Output 格式
           CHANGELOG=$(cat changelog_content.txt)
           echo "content<<EOF" >> $GITHUB_OUTPUT
           echo "$CHANGELOG" >> $GITHUB_OUTPUT
@@ -209,7 +209,7 @@ jobs:
       # 包含版本标签、发布说明和 APK 文件下载链接
       - name: Create GitHub Release
         if: steps.version.outputs.changed == 'true'
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v2.1.0
         with:
           # 创建的 git tag 名称（格式：v1.5.0）
           tag_name: v${{ steps.version.outputs.version_name }}
