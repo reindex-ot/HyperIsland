@@ -1,6 +1,8 @@
 package com.example.hyperisland.xposed
 
 import android.content.Intent
+import android.graphics.drawable.Icon
+import android.os.Build
 import android.os.Bundle
 
 /**
@@ -22,11 +24,11 @@ data class IslandRequest(
     /** 副标题（大岛右侧 / 焦点通知内容）*/
     val content: String,
     /**
-     * 用于显示的图标所属包名。
-     * - 空字符串：使用 HyperIsland 自身图标
-     * - 其他包名：使用指定应用的启动图标
+     * 岛图标实例（大岛、小岛、焦点通知共用）。
+     * 为 null 时 [IslandDispatcher] 自动回退到 HyperIsland 应用自身图标。
+     * 推荐使用 [Icon.createWithBitmap] 以保证跨进程可用。
      */
-    val iconPackage: String = "",
+    val icon: Icon? = null,
     /** 通知 ID；相同 ID 的旧通知会先被取消以触发岛动画。*/
     val notifId: Int = IslandDispatcher.NOTIF_ID,
     /** 岛自动收起超时，单位秒，默认 5。*/
@@ -35,35 +37,62 @@ data class IslandRequest(
     val firstFloat: Boolean = true,
     /** 后续更新时是否自动展开大岛。*/
     val enableFloat: Boolean = true,
+    /** 是否在通知栏显示持久通知（焦点通知），默认 true。*/
+    val showNotification: Boolean = true,
+    /**
+     * 岛边框高亮颜色，十六进制字符串，如 `"#E040FB"`。
+     * null 表示不设置，使用系统默认颜色。
+     */
+    val highlightColor: String? = null,
+    /**
+     * 为 true 时强制立即关闭当前正在显示的岛，不展示新内容。
+     * 常用于主动收起进行中的岛通知。
+     */
+    val dismissIsland: Boolean = false,
 ) {
     fun toBundle(): Bundle = Bundle().apply {
-        putString(KEY_TITLE,       title)
-        putString(KEY_CONTENT,     content)
-        putString(KEY_ICON_PKG,    iconPackage)
-        putInt(KEY_NOTIF_ID,       notifId)
-        putInt(KEY_TIMEOUT,        timeoutSecs)
-        putBoolean(KEY_FIRST_FLOAT, firstFloat)
-        putBoolean(KEY_ENABLE_FLOAT, enableFloat)
+        putString(KEY_TITLE,          title)
+        putString(KEY_CONTENT,        content)
+        putParcelable(KEY_ICON,       icon)
+        putInt(KEY_NOTIF_ID,          notifId)
+        putInt(KEY_TIMEOUT,           timeoutSecs)
+        putBoolean(KEY_FIRST_FLOAT,   firstFloat)
+        putBoolean(KEY_ENABLE_FLOAT,  enableFloat)
+        putBoolean(KEY_SHOW_NOTIF,    showNotification)
+        putString(KEY_HIGHLIGHT,      highlightColor)
+        putBoolean(KEY_DISMISS,       dismissIsland)
     }
 
     companion object {
-        private const val KEY_TITLE        = "title"
-        private const val KEY_CONTENT      = "content"
-        private const val KEY_ICON_PKG     = "iconPackage"
-        private const val KEY_NOTIF_ID     = "notifId"
-        private const val KEY_TIMEOUT      = "timeoutSecs"
-        private const val KEY_FIRST_FLOAT  = "firstFloat"
+        private const val KEY_TITLE       = "title"
+        private const val KEY_CONTENT     = "content"
+        private const val KEY_ICON        = "icon"
+        private const val KEY_NOTIF_ID    = "notifId"
+        private const val KEY_TIMEOUT     = "timeoutSecs"
+        private const val KEY_FIRST_FLOAT = "firstFloat"
         private const val KEY_ENABLE_FLOAT = "enableFloat"
+        private const val KEY_SHOW_NOTIF  = "showNotification"
+        private const val KEY_HIGHLIGHT   = "highlightColor"
+        private const val KEY_DISMISS     = "dismissIsland"
 
         fun fromBundle(b: Bundle) = IslandRequest(
-            title       = b.getString(KEY_TITLE, ""),
-            content     = b.getString(KEY_CONTENT, ""),
-            iconPackage = b.getString(KEY_ICON_PKG, ""),
-            notifId     = b.getInt(KEY_NOTIF_ID, IslandDispatcher.NOTIF_ID),
-            timeoutSecs = b.getInt(KEY_TIMEOUT, 5),
-            firstFloat  = b.getBoolean(KEY_FIRST_FLOAT, true),
-            enableFloat = b.getBoolean(KEY_ENABLE_FLOAT, true),
+            title            = b.getString(KEY_TITLE, ""),
+            content          = b.getString(KEY_CONTENT, ""),
+            icon             = iconFromBundle(b),
+            notifId          = b.getInt(KEY_NOTIF_ID, IslandDispatcher.NOTIF_ID),
+            timeoutSecs      = b.getInt(KEY_TIMEOUT, 5),
+            firstFloat       = b.getBoolean(KEY_FIRST_FLOAT, true),
+            enableFloat      = b.getBoolean(KEY_ENABLE_FLOAT, true),
+            showNotification = b.getBoolean(KEY_SHOW_NOTIF, true),
+            highlightColor   = b.getString(KEY_HIGHLIGHT),
+            dismissIsland    = b.getBoolean(KEY_DISMISS, false),
         )
+
+        private fun iconFromBundle(b: Bundle): Icon? =
+            if (Build.VERSION.SDK_INT >= 33)
+                b.getParcelable(KEY_ICON, Icon::class.java)
+            else
+                @Suppress("DEPRECATION") b.getParcelable(KEY_ICON)
 
         fun fromIntent(intent: Intent) = fromBundle(intent.extras ?: Bundle())
     }

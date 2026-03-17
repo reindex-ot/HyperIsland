@@ -23,16 +23,15 @@ import io.github.d4viddf.hyperisland_kit.models.TextInfo
  *
  * ## 原理
  * HyperOS 会抑制前台应用自身发出的岛通知。将通知改由 SystemUI（system UID）发出，
- * 可绕过该限制。[GenericProgressHook] 在 SystemUI 进程初始化时调用 [register]，
+ * 可绕过该限制。[IslandDispatcherHook] 在 SystemUI 进程启动时调用 [register]，
  * 注册一个受权限保护的 BroadcastReceiver；HyperIsland 应用通过 [sendBroadcast]
  * 触发它，由此以 SystemUI 身份发出岛通知。
  *
- * ## 其他 Xposed 模块的使用方式
- * 若模块本身已运行在 SystemUI 进程，直接调用 [post]：
+ * ## 其他 Xposed 模块的使用方式（同在 SystemUI 进程内）
  * ```kotlin
  * IslandDispatcher.post(
  *     context,
- *     IslandRequest(title = "标题", content = "内容", iconPackage = pkg)
+ *     IslandRequest(title = "标题", content = "内容", icon = myIcon)
  * )
  * ```
  *
@@ -40,7 +39,7 @@ import io.github.d4viddf.hyperisland_kit.models.TextInfo
  * ```kotlin
  * IslandDispatcher.sendBroadcast(
  *     context,
- *     IslandRequest(title = "标题", content = "内容")
+ *     IslandRequest(title = "标题", content = "内容", icon = myIcon)
  * )
  * ```
  */
@@ -79,11 +78,11 @@ object IslandDispatcher {
         }
     }
 
-    // ── 初始化（由 GenericProgressHook 在 SystemUI 加载时调用）───────────────
+    // ── 初始化 ───────────────────────────────────────────────────────────────
 
     /**
-     * 在 SystemUI 进程中注册广播接收器，应在 [GenericProgressHook.handleLoadPackage]
-     * 成功 hook 后调用一次。重复调用安全（幂等）。
+     * 在 SystemUI 进程中注册广播接收器。由 [IslandDispatcherHook] 在 Application.onCreate
+     * 后调用。重复调用安全（幂等）。
      */
     fun register(context: Context) {
         if (registered) return
@@ -91,8 +90,6 @@ object IslandDispatcher {
         createChannel(appCtx)
 
         val filter = IntentFilter(ACTION)
-        // 要求发送方持有 PERM 权限（signature 级，仅 HyperIsland 自身可持有）。
-        // Context.RECEIVER_EXPORTED 是 Android 13 新增的必填标志，低版本无此常量。
         if (Build.VERSION.SDK_INT >= 33) {
             appCtx.registerReceiver(receiver, filter, PERM, null, Context.RECEIVER_EXPORTED)
         } else {
@@ -115,13 +112,12 @@ object IslandDispatcher {
             val nm = context.getSystemService(NotificationManager::class.java) ?: return
             createChannel(context)
 
-            val appIcon = resolveIcon(context, request.iconPackage)
+            val appIcon = resolveIcon(request.icon, context)
 
             val islandBuilder = HyperIslandNotification.Builder(
                 context, "hyper_island_dispatch", request.title
             )
 
-            // 大岛图标、小岛图标、焦点通知图标均使用应用自身图标
             islandBuilder.addPicture(HyperPicture("key_island_icon", appIcon))
             islandBuilder.addPicture(HyperPicture("key_focus_icon",  appIcon))
 
@@ -132,7 +128,7 @@ object IslandDispatcher {
             )
             islandBuilder.setIslandFirstFloat(request.firstFloat)
             islandBuilder.setEnableFloat(request.enableFloat)
-            islandBuilder.setShowNotification(true)
+            islandBuilder.setShowNotification(request.showNotification)
             islandBuilder.setIslandConfig(timeout = request.timeoutSecs)
 
             // 小岛：仅图标
@@ -162,16 +158,21 @@ object IslandDispatcher {
 
             notif.extras.putAll(resourceBundle)
             flattenActionsToExtras(resourceBundle, notif.extras)
-            notif.extras.putString(
-                "miui.focus.param",
-                fixTextButtonJson(islandBuilder.buildJsonParam())
-            )
+
+            // 构建最终 JSON，依次应用：button 修正 → highlightColor / dismissIsland 注入
+            val jsonParam = islandBuilder.buildJsonParam()
+                .let { fixTextButtonJson(it) }
+                .let { applyExtraParams(it, request.highlightColor, request.dismissIsland) }
+            notif.extras.putString("miui.focus.param", jsonParam)
 
             // 先取消同 ID 的旧通知，让 HyperOS 视为全新通知并触发岛动画
             nm.cancel(request.notifId)
             nm.notify(request.notifId, notif)
 
-            XposedBridge.log("$TAG posted: ${request.title} | ${request.content} | id=${request.notifId}")
+            XposedBridge.log(
+                "$TAG posted: ${request.title} | ${request.content}" +
+                " | highlight=${request.highlightColor} | dismiss=${request.dismissIsland}"
+            )
         } catch (e: Exception) {
             XposedBridge.log("$TAG post error: ${e.message}")
         }
@@ -180,28 +181,25 @@ object IslandDispatcher {
     /**
      * [跨进程调用]
      * 从任意进程向 SystemUI 进程发送岛展示请求。
-     * 调用方无需持有任何额外权限；权限验证由 SystemUI 侧的 Receiver 注册时指定。
-     *
-     * 要求：HyperIsland 应用已在 Manifest 声明 [PERM] 权限并 uses-permission。
+     * 安全性由 Receiver 注册时的 broadcastPermission 保证，调用方无需额外操作。
      */
     fun sendBroadcast(context: Context, request: IslandRequest) {
         val intent = Intent(ACTION).apply {
             putExtras(request.toBundle())
         }
-        // 不传 receiverPermission；安全性由 Receiver 注册时的 broadcastPermission 保证
         context.sendBroadcast(intent)
     }
 
     // ── 内部工具 ──────────────────────────────────────────────────────────────
 
     /**
-     * 解析图标：优先使用 [iconPackage] 对应的应用启动图标（圆角处理），
+     * 优先使用 [IslandRequest.icon]；为 null 时从 HyperIsland 应用获取启动图标并做圆角处理；
      * 失败时降级为系统默认图标。
      */
-    private fun resolveIcon(context: Context, iconPackage: String): Icon {
-        val pkg = iconPackage.ifBlank { "com.example.hyperisland" }
+    private fun resolveIcon(icon: Icon?, context: Context): Icon {
+        if (icon != null) return icon
         return try {
-            InProcessController.getAppIcon(context, pkg)
+            InProcessController.getAppIcon(context, "com.example.hyperisland")
                 ?.toRounded(context)
                 ?: fallbackIcon(context)
         } catch (_: Exception) {
@@ -212,15 +210,23 @@ object IslandDispatcher {
     private fun fallbackIcon(context: Context): Icon =
         Icon.createWithResource(context, android.R.drawable.sym_def_app_icon)
 
-    private fun createChannel(context: Context) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
-        val nm = context.getSystemService(NotificationManager::class.java) ?: return
-        if (nm.getNotificationChannel(CHANNEL_ID) != null) return
-        nm.createNotificationChannel(
-            NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_HIGH).apply {
-                setShowBadge(false)
-            }
-        )
+    /**
+     * 将 [highlightColor] 和 [dismissIsland] 注入 param_v2 JSON。
+     * 这两个字段直接写入 HyperOS 协议层，不依赖 hyperisland_kit 的 Builder API。
+     */
+    private fun applyExtraParams(
+        jsonParam: String,
+        highlightColor: String?,
+        dismissIsland: Boolean,
+    ): String {
+        if (highlightColor == null && !dismissIsland) return jsonParam
+        return try {
+            val json = org.json.JSONObject(jsonParam)
+            val pv2  = json.optJSONObject("param_v2") ?: return jsonParam
+            highlightColor?.let { pv2.put("highlightColor", it) }
+            if (dismissIsland) pv2.put("dismissIsland", true)
+            json.toString()
+        } catch (_: Exception) { jsonParam }
     }
 
     /** 修正新库输出的 textButton JSON，将 "actionIntent" 字段替换为协议所需的 "action"。*/
@@ -250,5 +256,16 @@ object IslandDispatcher {
                 @Suppress("DEPRECATION") nested.getParcelable(key)
             if (action != null) extras.putParcelable(key, action)
         }
+    }
+
+    private fun createChannel(context: Context) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
+        val nm = context.getSystemService(NotificationManager::class.java) ?: return
+        if (nm.getNotificationChannel(CHANNEL_ID) != null) return
+        nm.createNotificationChannel(
+            NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_HIGH).apply {
+                setShowBadge(false)
+            }
+        )
     }
 }

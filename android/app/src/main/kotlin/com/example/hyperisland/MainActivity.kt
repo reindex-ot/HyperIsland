@@ -460,7 +460,17 @@ class MainActivity : FlutterActivity() {
 
     private fun handleShowTest(result: MethodChannel.Result) {
         try {
-            HyperIslandHelper.sendIslandNotification(this, "HyperIsland", "欢迎使用")
+            val icon = packageManager.getAppIcon(packageName)
+            com.example.hyperisland.xposed.IslandDispatcher.sendBroadcast(
+                this,
+                com.example.hyperisland.xposed.IslandRequest(
+                    title          = "HyperIsland",
+                    content        = "欢迎使用",
+                    icon           = icon,
+                    firstFloat     = false,
+                    highlightColor = "#E040FB",  // 炫酷紫红
+                )
+            )
             result.success(true)
         } catch (e: Exception) {
             Log.e(TAG, "Error showing test notification", e)
