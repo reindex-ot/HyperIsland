@@ -12,7 +12,6 @@ import androidx.core.content.ContextCompat
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
-import io.flutter.plugin.common.MethodCall
 import com.example.hyperisland.xposed.registeredTemplates
 import java.io.ByteArrayOutputStream
 
@@ -22,23 +21,15 @@ class MainActivity : FlutterActivity() {
     private val REQUEST_NOTIFICATION_PERMISSION = 1001
     private val REQUEST_APP_LIST_PERMISSION     = 1002
 
-    private var pendingResult: MethodChannel.Result? = null
-    private var pendingCall: MethodCall? = null
-
     private var pendingAppsResult: MethodChannel.Result? = null
     private var pendingAppsIncludeSystem: Boolean = false
-
-    private var pendingStartupNotification: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         checkAndRequestNotificationPermission()
+        // 模块已激活时通过广播触发 SystemUI 发出岛通知，无需本地通知权限
         if (isModuleActive()) {
-            if (checkNotificationPermission()) {
-                HyperIslandHelper.sendIslandNotification(this, "HyperIsland", "模块已激活")
-            } else {
-                pendingStartupNotification = true
-            }
+            HyperIslandHelper.sendIslandNotification(this, "HyperIsland", "模块已激活")
         }
     }
 
@@ -48,13 +39,8 @@ class MainActivity : FlutterActivity() {
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL).setMethodCallHandler { call, result ->
             when (call.method) {
                 "showTest" -> {
-                    if (checkNotificationPermission()) {
-                        handleShowTest(result)
-                    } else {
-                        pendingResult = result
-                        pendingCall = call
-                        requestNotificationPermission()
-                    }
+                    // 通过广播由 SystemUI 发送，无需本地通知权限
+                    handleShowTest(result)
                 }
 
                 "getTemplates" -> {
@@ -466,23 +452,7 @@ class MainActivity : FlutterActivity() {
         }
 
         if (requestCode == REQUEST_NOTIFICATION_PERMISSION) {
-            val granted = grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED
-
-            if (granted) {
-                if (pendingStartupNotification) {
-                    pendingStartupNotification = false
-                    HyperIslandHelper.sendIslandNotification(this, "HyperIsland", "模块已激活")
-                }
-                if (pendingCall != null && pendingResult != null) {
-                    handleShowTest(pendingResult!!)
-                    pendingResult = null
-                    pendingCall = null
-                }
-            } else {
-                pendingStartupNotification = false
-                pendingResult?.success(false)
-                pendingResult = null
-                pendingCall = null
+            if (grantResults.isEmpty() || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
                 Log.w(TAG, "Notification permission denied")
             }
         }
@@ -490,12 +460,8 @@ class MainActivity : FlutterActivity() {
 
     private fun handleShowTest(result: MethodChannel.Result) {
         try {
-            val success = HyperIslandHelper.sendIslandNotification(
-                this,
-                "HyperIsland",
-                "测试超级岛通知"
-            )
-            result.success(success)
+            HyperIslandHelper.sendIslandNotification(this, "HyperIsland", "欢迎使用")
+            result.success(true)
         } catch (e: Exception) {
             Log.e(TAG, "Error showing test notification", e)
             result.error("ERROR", e.message, null)
