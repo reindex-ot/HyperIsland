@@ -11,7 +11,7 @@ import de.robv.android.xposed.XposedHelpers
 import de.robv.android.xposed.callbacks.XC_LoadPackage
 
 /**
- * 通用进度条通知 Hook — 在 SystemUI 进程内 Hook MiuiBaseNotifUtil.generateInnerNotifBean()。
+ * 通用通知 Hook — 在 SystemUI 进程内 Hook MiuiBaseNotifUtil.generateInnerNotifBean()。
  *
  * 调用链：
  *   onNotificationPosted(sbn)
@@ -131,7 +131,7 @@ class GenericProgressHook : IXposedHookLoadPackage {
                         else channelCsv.split(",").filter { it.isNotBlank() }.toSet()
                         pkg to channels
                     }
-                cachedWhitelist = map
+                if (map.isNotEmpty()) cachedWhitelist = map
                 XposedBridge.log("HyperIsland[Generic]: whitelist loaded (${map.size} apps): ${map.keys}")
                 map
             } catch (e: Exception) {
