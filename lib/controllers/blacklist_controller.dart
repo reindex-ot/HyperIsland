@@ -333,6 +333,9 @@ class BlacklistController extends ChangeNotifier {
     'com.netease.harrypotter.vivo', // 哈利波特VIVO服
     'com.netease.harrypotter.nearme.gamecenter', // 哈利波特OPPO服
     'com.tencent.tmgp.harrypotter', // 哈利波特腾讯服
+    'com.tencent.tmgp.supercell.boombeach', // 海岛奇兵腾讯服
+    'com.cipaishe.wuhua.bilibili', // 物华弥新B服
+    'com.supercell.boombeach', // 海岛奇兵国际服
   };
 
   BlacklistController() {
