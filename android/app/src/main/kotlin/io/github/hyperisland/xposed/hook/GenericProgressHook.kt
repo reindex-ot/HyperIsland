@@ -231,6 +231,9 @@ class GenericProgressHook : IXposedHookLoadPackage {
 
             val extras = notif.extras ?: return
 
+            // 跳过媒体通知（MediaStyle），避免对音乐/播放器等通知二次处理
+            if (isMediaNotification(notif, extras)) return
+
             // 跳过已自带超级岛参数的通知，避免重复处理导致 SystemUI 崩溃
             if (extras.containsKey("miui.focus.param")) return
 
@@ -339,6 +342,18 @@ class GenericProgressHook : IXposedHookLoadPackage {
         } catch (e: Throwable) {
             XposedBridge.log("HyperIsland[Generic]: handleSbn error: ${e.message}")
         }
+    }
+
+    /**
+     * 判断是否为媒体通知（MediaStyle）。
+     * 满足以下任一条件即视为媒体通知，直接跳过处理：
+     *   1. extras 含 EXTRA_MEDIA_SESSION —— 调用了 setMediaSession()
+     *   2. EXTRA_TEMPLATE 包含 "MediaStyle" —— 使用了 Notification.MediaStyle
+     */
+    private fun isMediaNotification(notif: Notification, extras: android.os.Bundle): Boolean {
+        if (extras.containsKey(Notification.EXTRA_MEDIA_SESSION)) return true
+        val template = extras.getString(Notification.EXTRA_TEMPLATE) ?: return false
+        return template.contains("MediaStyle", ignoreCase = true)
     }
 
     /**
