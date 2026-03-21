@@ -4,7 +4,7 @@
 
 # HyperIsland
 
-**Dynamic Island–style progress notifications for HyperOS 3, powered by LSPosed**
+**LSPosed と HyperOS 3 の環境で Dynamic Island スタイルの進捗通知を表示します**
 
 [![GitHub Release](https://img.shields.io/github/v/release/1812z/HyperIsland?style=flat-square&logo=github&color=black)](https://github.com/1812z/HyperIsland/releases)
 [![License](https://img.shields.io/github/license/1812z/HyperIsland?style=flat-square&color=orange)](LICENSE)
@@ -19,81 +19,79 @@
 
 ---
 
-## ✨ Features
+## ✨ 機能
 
 <table>
 <tr>
 <td width="50%">
 
-### 📥 Download Manager Extension
-Intercepts HyperOS Download Manager notifications and displays them in Dynamic Island style, showing file name and progress with **pause, resume, and cancel** controls.
+### 📥 ダウンロードマネージャーを拡張
+HyperOS のダウンロードマネージャーの通知をインターセプトし、Dynamic Island のスタイルで表示します。ファイル名と進捗状況の表示と**一時停止、再開、キャンセル**のコントロールも利用可能です。
 
 </td>
 <td width="50%">
 
-### 🏝️ Dynamic Island + Focus Notification
-Intercepts standard Android notifications from any app and renders them in Dynamic Island + Focus Notification style, preserving the original action buttons.
+### 🏝️ Dynamic Island + フォーカス通知
+あらゆるアプリからの標準的な Android の通知をインターセプトし、元の操作ボタンを保持したままで Dynamic Island + フォーカス通知のスタイルで表示できます。
 
 </td>
 </tr>
 <tr>
 <td width="50%">
 
-### 🚫 Notification Blacklist
-Apps on the blacklist will not trigger pop-up notifications — only the Dynamic Island indicator is shown (auto-hidden with the status bar in fullscreen).
+### 🚫 通知のブラックリスト
+ブラックリストに登録されたアプリは、ポップアップ通知をトリガーしません。Dynamic Island のインジケーターのみが表示されます (全画面表示時はステータスバーと共に自動で非表示になります)。
 
 </td>
 <td width="50%">
 
-### 🔥 Hot Reload Support
-Configuration changes take effect **without restarting**. Only scope restarts are required after installing or updating apps.
-
+### 🔥 ホットリロードに対応
+設定の変更は、**再起動なし**で適用されます。アプリのインストールまたは更新後にスコープの再起動のみ必要になります。
 </td>
 </tr>
 </table>
 
 ---
 
-## 📋 Setup Guide
+## 📋 セットアップガイド
 
-### Step 1 — Activate the Module in LSPosed
+### ステップ 1 — LSPosed でモジュールを有効化
 
-> ⚠️ This module requires the **LSPosed** framework. Your device must be rooted and LSPosed must be installed.
+> ⚠️ このモジュールは **LSPosed** フレームワークが必要です。デバイスは root 化と LSPosed がインストールされている必要があります。
 
-1. Open **LSPosed Manager** and navigate to the **Modules** tab.
-2. Find **HyperIsland** and enable the toggle.
-3. In the module scope, check the recommended apps:
-    - **Download notifications**: check **Download Manager**
-    - **Universal adapter**: check **System UI**
-4. Save and tap the **restart button** in the top-right corner to restart the affected scope (or reboot your device) to activate the hook.
+1. **LSPosed Manager** を開きナビゲーションバーの **モジュール**のタブを選択します。
+2. そこから **HyperIsland** を探し、有効化に切り替えます。
+3. モジュールのスコープでおすすめのアプリを確認してください:
+    - **ダウンロード通知**: **ダウンロードマネージャー**を確認
+    - **ユニバーサルアダプター**: **システム UI**を確認
+4. 保存後に右上隅にある**再起動ボタン**をタップし、適用するスコープを再起動 (またはデバイスを再起動) し、フックを有効化します。
+---
+
+### ステップ 2 — HyperCeiler でフォーカス通知のホワイトリストを変更
+
+> 💡 Dynamic Island スタイルの通知には、HyperCeiler を通じて付与される「フォーカス通知」の権限が必要です。
+> 該当するオプションが見つからない場合は、HyperCeiler を最新のバージョンに更新してください。
+
+1. **HyperCeiler** を開いて**システム UI** または **Xiaomi サービスフレームワーク**の設定を開きます。
+2. **"フォーカス通知のホワイトリストを削除**を探します。
+3. 有効化した後にスコープを再起動してください。
 
 ---
 
-### Step 2 — Enable Focus Notification Whitelist in HyperCeiler
+## ⚠️ 重要な注意事項
 
-> 💡 Dynamic Island–style notifications require the "Focus Notification" permission granted through HyperCeiler.  
-> If you can't find the relevant option, please update HyperCeiler to the latest version.
-
-1. Open **HyperCeiler** and navigate to **System UI** or **Xiaomi Service Framework** settings.
-2. Find **"Remove Focus Notification Whitelist"**.
-3. Enable the toggle and restart the scope.
-
----
-
-## ⚠️ Important Notes
-
-| Item | Details |
+| 項目 | 詳細 |
 |------|---------|
-| Framework | Requires **LSPosed** and a **rooted** device |
-| Restart Timing | Restart scope after installing/updating apps; config changes generally support hot reload |
-| Notification Compatibility | Universal adapter only handles **standard Android notifications**; custom notification styles are not supported |
-| ROM Compatibility | Tested on **HyperOS 3**; other ROMs may have compatibility issues |
+| フレームワーク | **LSPosed** と **root 化済み**のデバイスが必要です。 |
+| 再起動のタイミング | アプリのインストール/更新後にスコープを再起動してください。設定変更はホットリロードに対応しています。 |
+| 通知の互換性 | ユニバーサルアダプターは**標準の Android 通知**のみ処理します。カスタム通知スタイルは対応していません。 |
+| ROM の互換性 | **HyperOS 3** でテスト済みです。その他の ROM では互換性の問題が発生する可能性があります。 |
 
 ---
 
-## 🔨 Build
+## 🔨 ビルド
 
-Make sure Flutter is installed, then run:
+Flutter がインストールされていることを確認後に以下を実行:
 
 ```bash
 flutter build apk --target-platform=android-arm64
@@ -101,9 +99,9 @@ flutter build apk --target-platform=android-arm64
 
 ---
 
-## 📄 License
+## 📄 ライセンス
 
-This project is open source under the [LICENSE](LICENSE). Issues and PRs are welcome.
+このプロジェクトは [MIT ライセンス](LICENSE)に基づき、オープンソースとして公開しています。Issue や Pull Request を歓迎します。
 
 <div align="center">
 
