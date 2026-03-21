@@ -40,6 +40,9 @@ class MarqueeHook : IXposedHookLoadPackage {
         /** 缓存的开关状态，null 表示尚未读取或已失效，下次访问时重新从 SettingsProvider 加载。 */
         @Volatile private var cachedEnabled: Boolean? = null
 
+        /** 缓存的滚动速度（px/s），null 表示需重新读取。 */
+        @Volatile private var cachedSpeed: Int? = null
+
         /** 确保 ContentObserver 只注册一次。 */
         @Volatile private var observerRegistered = false
 
@@ -55,8 +58,9 @@ class MarqueeHook : IXposedHookLoadPackage {
                 settingsUri, true,
                 object : android.database.ContentObserver(android.os.Handler(android.os.Looper.getMainLooper())) {
                     override fun onChange(selfChange: Boolean) {
-                        // 失效缓存，下次读取时重新查询
+                        // 失效所有缓存，下次读取时重新查询
                         cachedEnabled = null
+                        cachedSpeed = null
                         // 若开关被关闭，立即停止所有运行中的跑马灯
                         if (!isMarqueeEnabled(context)) {
                             stopAllMarquees()
@@ -79,11 +83,25 @@ class MarqueeHook : IXposedHookLoadPackage {
                 val uri = android.net.Uri.parse("content://io.github.hyperisland.settings/pref_marquee_feature")
                 context.contentResolver.query(uri, null, null, null, null)
                     ?.use { if (it.moveToFirst()) it.getInt(0) != 0 else false } ?: false
-            } catch (_: Exception) {
-                false
-            }
+            } catch (_: Exception) { false }
             cachedEnabled = result
             return result
+        }
+
+        /**
+         * 从缓存或 SettingsProvider 读取跑马灯速度（px/s），限位 20~500。
+         * 缓存有效期内（cachedSpeed != null）不再跨进程查询。
+         */
+        private fun getMarqueeSpeed(context: android.content.Context): Int {
+            cachedSpeed?.let { return it }
+            val speed = try {
+                val uri = android.net.Uri.parse("content://io.github.hyperisland.settings/pref_marquee_speed")
+                context.contentResolver.query(uri, null, null, null, null)
+                    ?.use { if (it.moveToFirst()) it.getInt(0) else 100 } ?: 100
+            } catch (_: Exception) { 100 }
+            val clamped = speed.coerceIn(20, 500)
+            cachedSpeed = clamped
+            return clamped
         }
 
         /** 停止所有当前存活的跑马灯并清空映射表。 */
@@ -111,7 +129,9 @@ class MarqueeHook : IXposedHookLoadPackage {
             val needMarquee = measuredW > availableW
 
             if (needMarquee && visibleW > 0) {
-                val controller = scrollerMap.getOrPut(textView) { MarqueeController(textView) }
+                val speed = getMarqueeSpeed(textView.context)
+                val controller = scrollerMap.getOrPut(textView) { MarqueeController(textView, speed) }
+                controller.speedPxPerSec = speed  // 实时同步最新速度设置
                 controller.start()
             } else {
                 stopMarquee(textView)
@@ -292,7 +312,7 @@ class MarqueeHook : IXposedHookLoadPackage {
      */
     class MarqueeController(
         private val view: TextView,
-        private val speedPxPerSec: Int = 100,
+        var speedPxPerSec: Int = 100,
         private val delayMs: Int = 1500
     ) : Choreographer.FrameCallback {
 

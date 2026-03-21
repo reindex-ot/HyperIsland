@@ -5,6 +5,7 @@ const kPrefResumeNotification = 'pref_resume_notification';
 const kPrefUseHookAppIcon     = 'pref_use_hook_app_icon';
 const kPrefRoundIcon          = 'pref_round_icon';
 const kPrefMarqueeFeature     = 'pref_marquee_feature';
+const kPrefMarqueeSpeed       = 'pref_marquee_speed';
 const kPrefWrapLongText       = 'pref_wrap_long_text';
 const kPrefThemeMode             = 'pref_theme_mode';
 const kPrefLocale                = 'pref_locale';
@@ -20,6 +21,7 @@ class SettingsController extends ChangeNotifier {
   bool useHookAppIcon = true;
   bool roundIcon = true;
   bool marqueeFeature = false;
+  int marqueeSpeed = 100;
   bool wrapLongText = false;
   bool checkUpdateOnLaunch = true;
   ThemeMode themeMode = ThemeMode.system;
@@ -32,6 +34,7 @@ class SettingsController extends ChangeNotifier {
     useHookAppIcon        = prefs.getBool(kPrefUseHookAppIcon) ?? true;
     roundIcon             = prefs.getBool(kPrefRoundIcon) ?? true;
     marqueeFeature        = prefs.getBool(kPrefMarqueeFeature) ?? false;
+    marqueeSpeed          = (prefs.getInt(kPrefMarqueeSpeed) ?? 100).clamp(20, 500);
     wrapLongText          = prefs.getBool(kPrefWrapLongText) ?? false;
     checkUpdateOnLaunch   = prefs.getBool(kPrefCheckUpdateOnLaunch) ?? true;
     themeMode = switch (prefs.getString(kPrefThemeMode)) {
@@ -70,6 +73,14 @@ class SettingsController extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(kPrefMarqueeFeature, value);
     marqueeFeature = value;
+    notifyListeners();
+  }
+
+  Future<void> setMarqueeSpeed(int value) async {
+    final clamped = value.clamp(20, 500);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(kPrefMarqueeSpeed, clamped);
+    marqueeSpeed = clamped;
     notifyListeners();
   }
 

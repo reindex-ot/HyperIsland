@@ -68,6 +68,10 @@ class _SettingsPageState extends State<SettingsPage> {
     await _ctrl.setMarqueeFeature(value);
   }
 
+  void _onMarqueeSpeedChanged(double value) {
+    _ctrl.setMarqueeSpeed(value.round());
+  }
+
   Future<void> _onWrapLongTextChanged(bool value) async {
     await _ctrl.setWrapLongText(value);
   }
@@ -328,6 +332,54 @@ class _SettingsPageState extends State<SettingsPage> {
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16)),
                         ),
+                        if (_ctrl.marqueeFeature) ...[
+                          const Divider(height: 1, indent: 16, endIndent: 16),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(20, 8, 20, 4),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(l10n.marqueeSpeedTitle,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyMedium),
+                                    Row(
+                                      children: [
+                                        Text(
+                                          l10n.marqueeSpeedLabel(
+                                              _ctrl.marqueeSpeed),
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodySmall
+                                              ?.copyWith(
+                                                  color: cs.onSurfaceVariant),
+                                        ),
+                                        if (_ctrl.marqueeSpeed != 100)
+                                          IconButton(
+                                            icon: const Icon(Icons.refresh, size: 16),
+                                            padding: EdgeInsets.zero,
+                                            visualDensity: VisualDensity.compact,
+                                            onPressed: () => _ctrl.setMarqueeSpeed(100),
+                                          ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                Slider(
+                                  value: _ctrl.marqueeSpeed.toDouble(),
+                                  min: 20,
+                                  max: 500,
+                                  divisions: 48,
+                                  onChanged: _onMarqueeSpeedChanged,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                         const Divider(height: 1, indent: 16, endIndent: 16),
                         SwitchListTile(
                           contentPadding: const EdgeInsets.symmetric(

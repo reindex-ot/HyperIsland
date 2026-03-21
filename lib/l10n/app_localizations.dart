@@ -400,6 +400,18 @@ abstract class AppLocalizations {
   /// **'长文本通知自动滚动显示'**
   String get marqueeFeatureSubtitle;
 
+  /// No description provided for @marqueeSpeedTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'滚动速度'**
+  String get marqueeSpeedTitle;
+
+  /// No description provided for @marqueeSpeedLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'{speed} 像素/秒'**
+  String marqueeSpeedLabel(int speed);
+
   /// No description provided for @wrapLongTextTitle.
   ///
   /// In zh, this message translates to:

@@ -176,6 +176,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get marqueeFeatureSubtitle => 'Auto scroll long text notification';
 
   @override
+  String get marqueeSpeedTitle => 'Scroll Speed';
+
+  @override
+  String marqueeSpeedLabel(int speed) {
+    return '$speed px/s';
+  }
+
+  @override
   String get wrapLongTextTitle => 'Auto Wrap (Experimental)';
 
   @override

@@ -167,6 +167,14 @@ class AppLocalizationsZh extends AppLocalizations {
   String get marqueeFeatureSubtitle => '长文本通知自动滚动显示';
 
   @override
+  String get marqueeSpeedTitle => '滚动速度';
+
+  @override
+  String marqueeSpeedLabel(int speed) {
+    return '$speed 像素/秒';
+  }
+
+  @override
   String get wrapLongTextTitle => '自动折行 (实验性)';
 
   @override

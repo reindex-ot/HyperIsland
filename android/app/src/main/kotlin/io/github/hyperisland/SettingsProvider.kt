@@ -57,6 +57,17 @@ class SettingsProvider : ContentProvider() {
             return cursor
         }
 
+        // 整数类型的 key，直接返回原始整数值（供 Hook 进程 getInt(0) 读取）
+        if (segment == "pref_marquee_speed") {
+            val speed = try {
+                prefs.getInt(flutterKey, 100)
+            } catch (_: ClassCastException) {
+                try { prefs.getLong(flutterKey, 100L).toInt() } catch (_: Exception) { 100 }
+            }
+            cursor.newRow().add(speed.coerceIn(20, 500))
+            return cursor
+        }
+
         // 布尔类型的 key，返回 1/0
         val value = if (prefs.contains(flutterKey)) {
             try { if (prefs.getBoolean(flutterKey, true)) 1 else 0 }
