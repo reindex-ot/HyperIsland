@@ -107,8 +107,7 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String get restartRootRequired =>
-      'このアプリに root 権限が付与されているか確認してください';
+  String get restartRootRequired => 'このアプリに root 権限が付与されているか確認してください';
 
   @override
   String get note1 =>
@@ -119,12 +118,10 @@ class AppLocalizationsJa extends AppLocalizations {
       '2. HyperCeiler でシステム UI と MIUI フレームワークのフォーカス通知のホワイトリストを無効化してください。';
 
   @override
-  String get note3 =>
-      '3. LSPosed Manager で有効化後に関連するスコープアプリを再起動する必要があります。';
+  String get note3 => '3. LSPosed Manager で有効化後に関連するスコープアプリを再起動する必要があります。';
 
   @override
-  String get note4 =>
-      '4. 一般的なアダプティブ表示に対応しています。適切なテンプレートを確認してみてください。';
+  String get note4 => '4. 一般的なアダプティブ表示に対応しています。適切なテンプレートを確認してみてください。';
 
   @override
   String get behaviorSection => '動作';
@@ -139,8 +136,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get aboutSection => 'アプリについて';
 
   @override
-  String get keepFocusNotifTitle =>
-      'ダウンロードの一時停止後もフォーカス通知を表示';
+  String get keepFocusNotifTitle => 'ダウンロードの一時停止後もフォーカス通知を表示';
 
   @override
   String get keepFocusNotifSubtitle =>
@@ -150,8 +146,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get unlockAllFocusTitle => 'フォーカス通知のホワイトリストを削除';
 
   @override
-  String get unlockAllFocusSubtitle =>
-      'すべてのアプリでシステム認証がない場合でもフォーカス通知を送信可能にします';
+  String get unlockAllFocusSubtitle => 'すべてのアプリでシステム認証がない場合でもフォーカス通知を送信可能にします';
 
   @override
   String get unlockFocusAuthTitle => 'フォーカス通知の署名検証を削除';
@@ -164,8 +159,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get checkUpdateOnLaunchTitle => '起動時に更新を確認する';
 
   @override
-  String get checkUpdateOnLaunchSubtitle =>
-      'アプリの起動時に最新のバージョンを自動で確認します';
+  String get checkUpdateOnLaunchSubtitle => 'アプリの起動時に最新のバージョンを自動で確認します';
 
   @override
   String get checkUpdate => '更新を確認';
@@ -177,8 +171,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get useAppIconTitle => 'アプリアイコンを使用する';
 
   @override
-  String get useAppIconSubtitle =>
-      'ダウンロードマネージャーの通知でアプリアイコンを使用します';
+  String get useAppIconSubtitle => 'ダウンロードマネージャーの通知でアプリアイコンを使用します';
 
   @override
   String get roundIconTitle => 'アイコンの角を丸める';
@@ -201,8 +194,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get wrapLongTextTitle => '自動で折り返す (試験的)';
 
   @override
-  String get wrapLongTextSubtitle =>
-      '長いフォーカス通知テキストを二行に分割します';
+  String get wrapLongTextSubtitle => '長いフォーカス通知テキストを二行に分割します';
 
   @override
   String get themeModeTitle => 'カラーモード';
@@ -253,15 +245,13 @@ class AppLocalizationsJa extends AppLocalizations {
   String get importFromClipboard => 'クリップボードからインポート';
 
   @override
-  String get importFromClipboardSubtitle =>
-      'クリップボードの JSON テキストから構成を復元します';
+  String get importFromClipboardSubtitle => 'クリップボードの JSON テキストから構成を復元します';
 
   @override
   String get qqGroup => 'QQ グループ';
 
   @override
-  String get restartScopeApp =>
-      '設定を適用するにはスコープアプリを再起動してください';
+  String get restartScopeApp => '設定を適用するにはスコープアプリを再起動してください';
 
   @override
   String get groupNumberCopied => 'グループ番号をクリップボードにコピーしました';
@@ -347,8 +337,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get searchApps => 'アプリ名またはパッケージ名で検索';
 
   @override
-  String get noAppsFound =>
-      'インストール済みのアプリが見つかりません\nアプリリストの権限が有効か確認してください';
+  String get noAppsFound => 'インストール済みのアプリが見つかりません\nアプリリストの権限が有効か確認してください';
 
   @override
   String get noMatchingApps => '一致するアプリがありません';
@@ -385,8 +374,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get noChannelsFound => '通知チャンネルがありません';
 
   @override
-  String get noChannelsFoundSubtitle =>
-      'このアプリには通知チャンネルがありません。通知の読み取りはできません。';
+  String get noChannelsFoundSubtitle => 'このアプリには通知チャンネルがありません。通知の読み取りはできません。';
 
   @override
   String allChannelsActive(int count) {
@@ -404,8 +392,7 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String get appDisabledBanner =>
-      'アプリが無効化されているため、以下のチャンネル設定は無効です';
+  String get appDisabledBanner => 'アプリが無効化されているため、以下のチャンネル設定は無効です';
 
   @override
   String channelImportance(String importance, String id) {
@@ -524,8 +511,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get navBlacklist => 'フォーカスのブラックリスト';
 
   @override
-  String get navBlacklistSubtitle =>
-      '特定のアプリでのフォーカス通知をブロック、フローティングまたは非表示にします';
+  String get navBlacklistSubtitle => '特定のアプリでのフォーカス通知をブロック、フローティングまたは非表示にします';
 
   @override
   String get presetGamesTitle => '人気のゲームをクイックでフィルター';
