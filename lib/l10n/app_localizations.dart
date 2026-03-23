@@ -976,6 +976,18 @@ abstract class AppLocalizations {
   /// **'默认'**
   String get optDefault;
 
+  /// No description provided for @optDefaultOn.
+  ///
+  /// In zh, this message translates to:
+  /// **'默认（开启）'**
+  String get optDefaultOn;
+
+  /// No description provided for @optDefaultOff.
+  ///
+  /// In zh, this message translates to:
+  /// **'默认（关闭）'**
+  String get optDefaultOff;
+
   /// No description provided for @optOn.
   ///
   /// In zh, this message translates to:

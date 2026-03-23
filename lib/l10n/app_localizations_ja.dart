@@ -497,6 +497,12 @@ class AppLocalizationsJa extends AppLocalizations {
   String get optDefault => 'デフォルト';
 
   @override
+  String get optDefaultOn => 'デフォルト（ON）';
+
+  @override
+  String get optDefaultOff => 'デフォルト（OFF）';
+
+  @override
   String get optOn => 'ON';
 
   @override

@@ -164,6 +164,8 @@
   "iconModeNotifLarge": "大きな通知アイコン",
   "iconModeAppIcon": "アプリアイコン",
   "optDefault": "デフォルト",
+  "optDefaultOn": "デフォルト（ON）",
+  "optDefaultOff": "デフォルト（OFF）",
   "optOn": "ON",
   "optOff": "OFF",
 

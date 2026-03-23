@@ -164,6 +164,8 @@
   "iconModeNotifLarge": "Large notification icon",
   "iconModeAppIcon": "App icon",
   "optDefault": "Default",
+  "optDefaultOn": "Default (On)",
+  "optDefaultOff": "Default (Off)",
   "optOn": "On",
   "optOff": "Off",
 

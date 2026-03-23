@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../controllers/settings_controller.dart';
 import '../controllers/whitelist_controller.dart';
 import '../l10n/app_localizations.dart';
 
@@ -125,6 +126,18 @@ class BatchChannelSettingsSheet extends StatefulWidget {
 
 class _BatchChannelSettingsSheetState
     extends State<BatchChannelSettingsSheet> {
+  AppLocalizations _l10n(BuildContext context) => AppLocalizations.of(context)!;
+
+  String _defaultOnLabel(BuildContext context) => _l10n(context).optDefaultOn;
+
+  String _defaultOffLabel(BuildContext context) => _l10n(context).optDefaultOff;
+
+  String _preserveSmallIconDefaultLabel(BuildContext context) {
+    final l10n = _l10n(context);
+    final enabled = SettingsController.instance.preserveStatusBarSmallIcon;
+    return enabled ? l10n.optDefaultOn : l10n.optDefaultOff;
+  }
+
   String? _template;
   String? _iconMode;
   String? _focusIconMode;
@@ -348,7 +361,7 @@ class _BatchChannelSettingsSheetState
                     value: _firstFloat,
                     showNotChange: !_isSingle,
                     items: [
-                      DropdownMenuItem(value: kTriOptDefault, child: Text(l10n.optDefault)),
+                      DropdownMenuItem(value: kTriOptDefault, child: Text(_defaultOffLabel(context))),
                       DropdownMenuItem(value: kTriOptOn,      child: Text(l10n.optOn)),
                       DropdownMenuItem(value: kTriOptOff,     child: Text(l10n.optOff)),
                     ],
@@ -360,7 +373,7 @@ class _BatchChannelSettingsSheetState
                     value: _enableFloat,
                     showNotChange: !_isSingle,
                     items: [
-                      DropdownMenuItem(value: kTriOptDefault, child: Text(l10n.optDefault)),
+                      DropdownMenuItem(value: kTriOptDefault, child: Text(_defaultOffLabel(context))),
                       DropdownMenuItem(value: kTriOptOn,      child: Text(l10n.optOn)),
                       DropdownMenuItem(value: kTriOptOff,     child: Text(l10n.optOff)),
                     ],
@@ -449,7 +462,7 @@ class _BatchChannelSettingsSheetState
                     value: _focusNotif,
                     showNotChange: !_isSingle,
                     items: [
-                      DropdownMenuItem(value: kTriOptDefault, child: Text(l10n.optDefault)),
+                      DropdownMenuItem(value: kTriOptDefault, child: Text(_defaultOnLabel(context))),
                       DropdownMenuItem(value: kTriOptOn,      child: Text(l10n.optOn)),
                       DropdownMenuItem(value: kTriOptOff,     child: Text(l10n.optOff)),
                     ],
@@ -461,7 +474,7 @@ class _BatchChannelSettingsSheetState
                     value: _preserveSmallIcon,
                     showNotChange: !_isSingle,
                     items: [
-                      DropdownMenuItem(value: kTriOptDefault, child: Text(l10n.optDefault)),
+                      DropdownMenuItem(value: kTriOptDefault, child: Text(_preserveSmallIconDefaultLabel(context))),
                       DropdownMenuItem(value: kTriOptOn,      child: Text(l10n.optOn)),
                       DropdownMenuItem(value: kTriOptOff,     child: Text(l10n.optOff)),
                     ],

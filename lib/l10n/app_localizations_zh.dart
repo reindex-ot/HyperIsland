@@ -493,6 +493,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get optDefault => '默认';
 
   @override
+  String get optDefaultOn => '默认（开启）';
+
+  @override
+  String get optDefaultOff => '默认（关闭）';
+
+  @override
   String get optOn => '开启';
 
   @override
