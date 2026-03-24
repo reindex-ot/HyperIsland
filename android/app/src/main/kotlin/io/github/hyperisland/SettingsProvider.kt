@@ -81,7 +81,11 @@ class SettingsProvider : ContentProvider() {
             if (segment == "pref_marquee_feature" ||
                 segment == "pref_wrap_long_text" ||
                 segment == "pref_unlock_all_focus" ||
-                segment == "pref_unlock_focus_auth") 0 else 1
+                segment == "pref_unlock_focus_auth" ||
+                segment == "pref_default_first_float" ||
+                segment == "pref_default_enable_float" ||
+                segment == "pref_default_marquee" ||
+                segment == "pref_default_preserve_small_icon") 0 else 1
         }
         cursor.newRow().add(value)
         return cursor
