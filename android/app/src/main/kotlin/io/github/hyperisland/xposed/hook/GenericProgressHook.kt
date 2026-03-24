@@ -402,7 +402,8 @@ class GenericProgressHook : IXposedHookLoadPackage {
                 context, "focus_icon:$pkg/$channelId",
                 "pref_channel_focus_icon_${pkg}_$channelId", "auto"
             )
-            val marqueeEnabled = resolveTriStateBoolean(
+            val isOngoing = (notif.flags and Notification.FLAG_ONGOING_EVENT) != 0
+            val marqueeEnabled = !isOngoing && resolveTriStateBoolean(
                 defaultMarquee,
                 loadChannelStringSetting(context, "marquee:$pkg/$channelId", "pref_channel_marquee_${pkg}_$channelId", "default")
             )
@@ -434,7 +435,7 @@ class GenericProgressHook : IXposedHookLoadPackage {
                     firstFloat      = firstFloat,
                     enableFloatMode = enableFloatMode,
                     islandTimeout   = islandTimeout,
-                    isOngoing       = (notif.flags and Notification.FLAG_ONGOING_EVENT) != 0,
+                    isOngoing       = isOngoing,
                     contentIntent   = notif.contentIntent,
                 ),
             )
