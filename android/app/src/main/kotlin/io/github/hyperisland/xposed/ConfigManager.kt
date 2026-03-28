@@ -46,11 +46,11 @@ object ConfigManager {
     @Synchronized
     fun init(module: XposedModule) {
         if (initialized) return
-        initialized = true
 
         val p = module.getRemotePreferences(PREFS_GROUP)
         p.registerOnSharedPreferenceChangeListener(prefsListener)
         prefs = p
+        initialized = true
         module.log("HyperIsland[ConfigManager]: remote prefs '$PREFS_GROUP' loaded")
         notifyListeners()
     }

@@ -44,8 +44,6 @@ object DownloadHook {
 
         module.log("HyperIsland: handleLoadPackage pkg=$pkg")
 
-        DownloadIslandNotification.init(module)
-
         try {
             hookNotificationBuilder(module, classLoader, pkg)
 
