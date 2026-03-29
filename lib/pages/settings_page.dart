@@ -39,26 +39,10 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Future<void> _onResumeNotificationChanged(bool value) async {
     await _ctrl.setResumeNotification(value);
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(AppLocalizations.of(context)!.restartScopeApp),
-          duration: const Duration(seconds: 4),
-        ),
-      );
-    }
   }
 
   Future<void> _onUseHookAppIconChanged(bool value) async {
     await _ctrl.setUseHookAppIcon(value);
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(AppLocalizations.of(context)!.restartScopeApp),
-          duration: const Duration(seconds: 4),
-        ),
-      );
-    }
   }
 
   Future<void> _onRoundIconChanged(bool value) async {

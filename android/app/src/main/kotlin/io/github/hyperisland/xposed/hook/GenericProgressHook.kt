@@ -78,7 +78,7 @@ object GenericProgressHook {
         cachedWhitelist = null
         cachedTemplates.clear()
         cachedChannelSettings.clear()
-        module.log("$TAG: settings changed, cache cleared ($reason)")
+        //module.log("$TAG: settings changed, cache cleared ($reason)")
     }
 
     fun loadChannelTemplate(pkg: String, channelId: String): String {
@@ -281,8 +281,11 @@ object GenericProgressHook {
             )
 
             module.log(
-                "$TAG: $pkg/$channelId | $title | $progressPercent% | template=$template | buttons=${actions.size} | largeIcon=${largeIcon != null} | preserveSmallIcon=$preserveStatusBarSmallIcon"
+                "$TAG: $pkg/$channelId | $title |  template=$template"
             )
+//            module.log(
+//                "$TAG: $pkg/$channelId | $title | $progressPercent% | template=$template | buttons=${actions.size} | largeIcon=${largeIcon != null} | preserveSmallIcon=$preserveStatusBarSmallIcon"
+//            )
 
             TemplateRegistry.dispatch(
                 templateId = template,

@@ -31,7 +31,7 @@ object MarqueeHook {
         ConfigManager.addChangeListener {
             cachedSpeed = null
             stopAllMarquees()
-            module.log("$TAG: settings changed via Observer, cache cleared")
+            //module.log("$TAG: settings changed via Observer, cache cleared")
         }
         observerRegistered = true
         module.log("$TAG: ConfigManager Observer registered in SystemUI")

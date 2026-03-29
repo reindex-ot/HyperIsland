@@ -24,18 +24,11 @@ object UnlockFocusAuthHook {
     private fun isEnabled(): Boolean = ConfigManager.getBoolean(SETTINGS_KEY, false)
 
     fun init(module: XposedModule, param: PackageLoadedParam) {
-        // 在 XMSF Application.onCreate 初始化 ConfigManager
-        try {
-            val appOnCreate = param.defaultClassLoader
-                .loadClass("android.app.Application")
-                .getDeclaredMethod("onCreate")
-            module.hook(appOnCreate).intercept { chain ->
-                val result = chain.proceed()
-                ConfigManager.init(module)
-                result
-            }
-        } catch (_: Throwable) {}
-
+        ConfigManager.init(module)
+        if (!isEnabled()) {
+            module.log("$TAG: disabled, skipping hook for ${param.packageName}")
+            return
+        }
         hookAuthSession(module, param.defaultClassLoader)
     }
 
@@ -90,7 +83,7 @@ object UnlockFocusAuthHook {
 
             module.hook(targetMethod).intercept { chain ->
                 val error = chain.args[0]
-                if (error == null || !isEnabled()) return@intercept chain.proceed()
+                if (error == null) return@intercept chain.proceed()
 
                 try {
                     val originalCode = getIntField(error, "a")

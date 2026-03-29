@@ -25,6 +25,11 @@ object UnlockAllFocusHook {
     private fun isEnabled(): Boolean = ConfigManager.getBoolean(SETTINGS_KEY, false)
 
     fun init(module: XposedModule, param: PackageLoadedParam) {
+        ConfigManager.init(module)
+        if (!isEnabled()) {
+            module.log("$TAG: disabled, skipping hook for ${param.packageName}")
+            return
+        }
         hookCanShowFocus(module, param.defaultClassLoader)
         hookCanCustomFocus(module, param.defaultClassLoader)
     }
@@ -33,10 +38,7 @@ object UnlockAllFocusHook {
         try {
             val clazz = classLoader.loadClass(TARGET_CLASS)
             val method = clazz.getDeclaredMethod("canShowFocus", Context::class.java, String::class.java)
-            module.hook(method).intercept { chain ->
-                if (isEnabled()) return@intercept true
-                chain.proceed()
-            }
+            module.hook(method).intercept { chain -> true }
             module.log("$TAG: hooked canShowFocus(Context, String)")
         } catch (e: Throwable) {
             module.log("$TAG: failed to hook canShowFocus — ${e.message}")
@@ -47,10 +49,7 @@ object UnlockAllFocusHook {
         try {
             val clazz = classLoader.loadClass(TARGET_CLASS)
             val method = clazz.getDeclaredMethod("canCustomFocus", String::class.java)
-            module.hook(method).intercept { chain ->
-                if (isEnabled()) return@intercept true
-                chain.proceed()
-            }
+            module.hook(method).intercept { chain -> true }
             module.log("$TAG: hooked canCustomFocus(String)")
         } catch (e: Throwable) {
             module.log("$TAG: canCustomFocus not found (may be expected) — ${e.message}")

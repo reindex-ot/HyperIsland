@@ -13,7 +13,6 @@ import android.graphics.drawable.Icon
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import io.github.hyperisland.getAppIcon
 import io.github.hyperisland.xposed.templates.DownloadIslandNotification
 import io.github.libxposed.api.XposedModule
@@ -24,6 +23,8 @@ import io.github.libxposed.api.XposedModule
  * pause/resume 完全复刻 MiuiDownloadManager 的 ContentProvider 逻辑。
  */
 object InProcessController {
+
+    private const val TAG = "HyperIsland[InProcessController]"
 
     private const val ACTION          = "io.github.hyperisland.INTERNAL_CTRL"
     private const val EXTRA_CMD       = "cmd"
@@ -48,6 +49,7 @@ object InProcessController {
     @Volatile private var registered = false
     @Volatile private var resumeNotificationEnabled = true
     @Volatile var useHookAppIconEnabled = true
+    @Volatile private var module: XposedModule? = null
 
     data class DownloadNotifSnapshot(
         val notifId: Int,
@@ -63,48 +65,25 @@ object InProcessController {
     @Volatile var lastDownloadSnapshot: DownloadNotifSnapshot? = null
     private const val PAUSED_OVERLAY_ID = 0x48594F01
 
-    private fun log(msg: String) = Log.d("HyperIsland", msg)
-
     private fun loadSettings() {
-        log("HyperIsland: loadSettings: starting...")
-        ConfigManager.debugDump()
-        
         resumeNotificationEnabled = ConfigManager.getBoolean("pref_resume_notification", true)
-        log("HyperIsland: loadSettings: pref_resume_notification=$resumeNotificationEnabled")
-        
         useHookAppIconEnabled = ConfigManager.getBoolean("pref_use_hook_app_icon", true)
-        log("HyperIsland: loadSettings: pref_use_hook_app_icon=$useHookAppIconEnabled")
-        
-        log("HyperIsland: settings loaded — resumeNotification=$resumeNotificationEnabled useHookAppIcon=$useHookAppIconEnabled")
+        module?.log("$TAG: settings loaded — resumeNotification=$resumeNotificationEnabled useHookAppIcon=$useHookAppIconEnabled")
     }
 
-    fun ensureRegistered(context: Context, module: XposedModule) {
-        log("HyperIsland: ensureRegistered called, registered=$registered, pid=${android.os.Process.myPid()}")
+    fun ensureRegistered(context: Context, xposedModule: XposedModule) {
         if (registered) return
         val appCtx = context.applicationContext ?: context
+        module = xposedModule
 
-        log("HyperIsland: calling ConfigManager.init with context=$appCtx...")
-        ConfigManager.init(module)
-        
-        log("HyperIsland: calling loadSettings...")
+        ConfigManager.init(xposedModule)
         loadSettings()
-        
-        log("HyperIsland: adding change listener...")
-        ConfigManager.addChangeListener {
-            loadSettings()
-            log("HyperIsland: settings reloaded via Observer")
-        }
-
-        runCatching {
-            val dm = appCtx.getSystemService(Context.DOWNLOAD_SERVICE)
-            log("HyperIsland: DownloadManager runtime class = ${dm?.javaClass?.name}")
-        }
+        ConfigManager.addChangeListener { loadSettings() }
 
         val receiver = object : BroadcastReceiver() {
             override fun onReceive(ctx: Context, intent: Intent) {
                 val id = intent.getLongExtra(EXTRA_ID, -1L)
                 val cmd = intent.getStringExtra(EXTRA_CMD)
-                log("HyperIsland: onReceive cmd=$cmd id=$id")
                 when (cmd) {
                     CMD_PAUSE -> {
                         val isAll = id <= 0
@@ -127,7 +106,6 @@ object InProcessController {
                         if (notifId > 0) {
                             val nm = ctx.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
                             nm?.cancel(notifTag, notifId)
-                            log("HyperIsland: dismiss notifId=$notifId tag=$notifTag")
                         }
                     }
                 }
@@ -142,7 +120,7 @@ object InProcessController {
             appCtx.registerReceiver(receiver, filter)
         }
         registered = true
-        log("HyperIsland: InProcessController registered in pid=${android.os.Process.myPid()}")
+        xposedModule.log("$TAG: registered in pid=${android.os.Process.myPid()}")
     }
 
     /**
@@ -158,15 +136,15 @@ object InProcessController {
         for (className in candidates) {
             try {
                 val clazz = classLoader.loadClass(className)
-                module.log("HyperIsland: Found MiuiDownloadManager: $className")
+                module.log("$TAG: Found MiuiDownloadManager: $className")
 
                 val pauseMethod = clazz.getDeclaredMethod("pauseDownload", LongArray::class.java)
                 module.hook(pauseMethod).intercept { chain ->
                     val ids = chain.args[0] as? LongArray
-                    module.log("HyperIsland: pauseDownload called ids=${ids?.toList()}")
+                    module.log("$TAG: pauseDownload called ids=${ids?.toList()}")
                     chain.proceed()
                 }
-                module.log("HyperIsland: Hooked pauseDownload in $className")
+                module.log("$TAG: Hooked pauseDownload in $className")
                 break
             } catch (_: Throwable) {}
         }
@@ -211,7 +189,6 @@ object InProcessController {
 
     private fun pause(context: Context, downloadId: Long) {
         val realIds = queryActiveIds(context)
-        log("HyperIsland: pause notifId=$downloadId realIds=$realIds")
         val idsToTry = (listOf(downloadId) + realIds).distinct()
         val values = ContentValues().apply {
             put("status",  STATUS_PAUSED_BY_APP)
@@ -221,10 +198,9 @@ object InProcessController {
             for (uri in listOf(DOWNLOADS_URI_ALL, DOWNLOADS_URI)) {
                 try {
                     val rows = context.contentResolver.update(uri, values, "_id = ?", arrayOf(id.toString()))
-                    log("HyperIsland: pause id=$id uri=$uri rows=$rows")
                     if (rows > 0) return
                 } catch (e: Exception) {
-                    log("HyperIsland: pause id=$id uri=$uri err=${e.message}")
+                    module?.logError("$TAG: pause id=$id uri=$uri err=${e.message}")
                 }
             }
         }
@@ -233,7 +209,6 @@ object InProcessController {
 
     private fun resume(context: Context, downloadId: Long) {
         val realIds = queryPausedIds(context)
-        log("HyperIsland: resume notifId=$downloadId realIds=$realIds")
         val idsToTry = (listOf(downloadId) + realIds).distinct()
         val values = ContentValues().apply {
             put("status",  STATUS_RUNNING)
@@ -243,10 +218,9 @@ object InProcessController {
             for (uri in listOf(DOWNLOADS_URI_ALL, DOWNLOADS_URI)) {
                 try {
                     val rows = context.contentResolver.update(uri, values, "_id = ?", arrayOf(id.toString()))
-                    log("HyperIsland: resume id=$id uri=$uri rows=$rows")
                     if (rows > 0) return
                 } catch (e: Exception) {
-                    log("HyperIsland: resume id=$id uri=$uri err=${e.message}")
+                    module?.logError("$TAG: resume id=$id uri=$uri err=${e.message}")
                 }
             }
         }
@@ -268,7 +242,7 @@ object InProcessController {
             }
             ids
         } catch (e: Exception) {
-            log("HyperIsland: queryActiveIds err=${e.message}")
+            module?.logError("$TAG: queryActiveIds err=${e.message}")
             emptyList()
         }
     }
@@ -284,7 +258,7 @@ object InProcessController {
             }
             ids
         } catch (e: Exception) {
-            log("HyperIsland: queryPausedIds err=${e.message}")
+            module?.logError("$TAG: queryPausedIds err=${e.message}")
             emptyList()
         }
     }
@@ -293,10 +267,9 @@ object InProcessController {
         try {
             val dm = context.getSystemService(Context.DOWNLOAD_SERVICE) as? DownloadManager
             val n = dm?.remove(downloadId) ?: 0
-            log("HyperIsland: cancel dm.remove($downloadId)=$n")
             if (n == 0) cancelAll(context)
         } catch (e: Exception) {
-            log("HyperIsland: cancel failed: ${e.message}")
+            module?.logError("$TAG: cancel failed: ${e.message}")
             cancelAll(context)
         }
     }
@@ -313,10 +286,9 @@ object InProcessController {
                     "status = ? OR status = ?",
                     arrayOf(STATUS_RUNNING.toString(), STATUS_PENDING.toString())
                 )
-                log("HyperIsland: pauseAll uri=$uri rows=$rows")
                 if (rows > 0) return
             } catch (e: Exception) {
-                log("HyperIsland: pauseAll uri=$uri err=${e.message}")
+                module?.logError("$TAG: pauseAll uri=$uri err=${e.message}")
             }
         }
     }
@@ -327,12 +299,11 @@ object InProcessController {
                 put("status",  STATUS_RUNNING)
                 put("control", CONTROL_RUN)
             }
-            val rows = context.contentResolver.update(
+            context.contentResolver.update(
                 DOWNLOADS_URI, values, "status = ?", arrayOf(STATUS_PAUSED_BY_APP.toString())
             )
-            log("HyperIsland: resumeAll rows=$rows")
         } catch (e: Exception) {
-            log("HyperIsland: resumeAll failed: ${e.message}")
+            module?.logError("$TAG: resumeAll failed: ${e.message}")
         }
     }
 
@@ -346,26 +317,17 @@ object InProcessController {
             )
             val ids = mutableListOf<Long>()
             cursor?.use { while (it.moveToNext()) ids.add(it.getLong(0)) }
-            if (ids.isNotEmpty()) {
-                val removed = dm?.remove(*ids.toLongArray()) ?: 0
-                log("HyperIsland: cancelAll removed=$removed ids=$ids")
-            }
+            if (ids.isNotEmpty()) dm?.remove(*ids.toLongArray())
         } catch (e: Exception) {
-            log("HyperIsland: cancelAll failed: ${e.message}")
+            module?.logError("$TAG: cancelAll failed: ${e.message}")
         }
     }
 
     // ── 暂停覆盖通知 ──────────────────────────────────────────────────────────
 
     private fun postPausedOverlay(context: Context, isAll: Boolean) {
-        if (!resumeNotificationEnabled) {
-            log("HyperIsland: postPausedOverlay — disabled by setting")
-            return
-        }
-        val snap = lastDownloadSnapshot ?: run {
-            log("HyperIsland: postPausedOverlay — no snapshot")
-            return
-        }
+        if (!resumeNotificationEnabled) return
+        val snap = lastDownloadSnapshot ?: return
         val overlaySnap = snap.copy(
             notifId    = PAUSED_OVERLAY_ID,
             notifTag   = null,
@@ -414,18 +376,16 @@ object InProcessController {
 
             val nm = context.getSystemService(NotificationManager::class.java)
             nm?.notify(null, snapshot.notifId, notif)
-            log("HyperIsland: repostAsPaused id=${snapshot.notifId}")
         } catch (e: Exception) {
-            log("HyperIsland: repostAsPaused failed: ${e.message}")
+            module?.logError("$TAG: repostAsPaused failed: ${e.message}")
         }
     }
 
     private fun cancelPausedOverlay(context: Context) {
         try {
             context.getSystemService(NotificationManager::class.java)?.cancel(PAUSED_OVERLAY_ID)
-            log("HyperIsland: cancelPausedOverlay")
         } catch (e: Exception) {
-            log("HyperIsland: cancelPausedOverlay failed: ${e.message}")
+            module?.logError("$TAG: cancelPausedOverlay failed: ${e.message}")
         }
     }
 
@@ -436,10 +396,9 @@ object InProcessController {
             val method = dm.javaClass.getMethod(methodName, LongArray::class.java)
             method.isAccessible = true
             method.invoke(dm, longArrayOf(downloadId))
-            log("HyperIsland: $methodName($downloadId) OK [${dm.javaClass.name}]")
             true
         } catch (e: Exception) {
-            log("HyperIsland: $methodName reflection failed: ${e.message}")
+            module?.logError("$TAG: $methodName reflection failed: ${e.message}")
             false
         }
     }
