@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import '../controllers/whitelist_controller.dart';
 import '../l10n/generated/app_localizations.dart';
 import '../widgets/batch_channel_settings_sheet.dart';
+import '../services/app_cache_service.dart';
 
 class AppChannelsPage extends StatefulWidget {
   final AppInfo app;

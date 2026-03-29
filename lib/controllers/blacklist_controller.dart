@@ -1,24 +1,8 @@
-import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../services/app_cache_service.dart';
 
-const _channel = MethodChannel('io.github.hyperisland/test');
 const kPrefAppBlacklist = 'pref_app_blacklist';
-
-class AppInfo {
-  final String packageName;
-  final String appName;
-  final Uint8List icon;
-  final bool isSystem;
-
-  const AppInfo({
-    required this.packageName,
-    required this.appName,
-    required this.icon,
-    this.isSystem = false,
-  });
-}
 
 class BlacklistController extends ChangeNotifier {
   List<AppInfo> _allApps = [];
@@ -381,28 +365,7 @@ class BlacklistController extends ChangeNotifier {
           ? {}
           : csv.split(',').where((s) => s.isNotEmpty).toSet();
 
-      final rawList =
-          await _channel.invokeMethod<List<dynamic>>('getInstalledApps', {
-            'includeSystem': true,
-          }) ??
-          [];
-      const _excludedPackages = {
-        'com.android.providers.downloads',
-        'com.xiaomi.android.app.downloadmanager',
-        'com.android.systemui',
-      };
-      _allApps = rawList
-          .map((raw) {
-            final map = Map<String, dynamic>.from(raw as Map);
-            return AppInfo(
-              packageName: map['packageName'] as String,
-              appName: map['appName'] as String,
-              icon: Uint8List.fromList((map['icon'] as List).cast<int>()),
-              isSystem: map['isSystem'] as bool? ?? false,
-            );
-          })
-          .where((a) => !_excludedPackages.contains(a.packageName))
-          .toList();
+      _allApps = await AppCacheService.instance.getApps();
       _resort();
     } catch (e) {
       debugPrint('BlacklistController._load error: $e');

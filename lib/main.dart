@@ -3,8 +3,11 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'controllers/settings_controller.dart';
 import 'l10n/generated/app_localizations.dart';
 import 'pages/main_page.dart';
+import 'services/app_cache_service.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  AppCacheService.instance.initialize();
   runApp(const MyApp());
 }
 

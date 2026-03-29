@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../controllers/blacklist_controller.dart';
 import '../l10n/generated/app_localizations.dart';
+import '../services/app_cache_service.dart';
 
 class BlacklistPage extends StatefulWidget {
   const BlacklistPage({super.key});

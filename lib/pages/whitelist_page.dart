@@ -3,6 +3,7 @@ import '../controllers/whitelist_controller.dart';
 import '../l10n/generated/app_localizations.dart';
 import '../widgets/batch_channel_settings_sheet.dart';
 import 'app_channels_page.dart';
+import '../services/app_cache_service.dart';
 
 class WhitelistPage extends StatefulWidget {
   const WhitelistPage({super.key});
