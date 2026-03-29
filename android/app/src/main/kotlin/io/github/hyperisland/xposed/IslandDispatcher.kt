@@ -11,8 +11,8 @@ import android.graphics.drawable.Icon
 import android.os.Build
 import io.github.hyperisland.getAppIcon
 import android.os.Bundle
-import android.util.Log
 import io.github.hyperisland.xposed.hook.FocusNotifStatusBarIconHook
+import io.github.libxposed.api.XposedModule
 import io.github.d4viddf.hyperisland_kit.HyperAction
 import io.github.d4viddf.hyperisland_kit.HyperIslandNotification
 import io.github.d4viddf.hyperisland_kit.HyperPicture
@@ -69,6 +69,7 @@ object IslandDispatcher {
     private const val TAG          = "HyperIsland[Dispatcher]"
 
     @Volatile private var registered = false
+    @Volatile private var module: XposedModule? = null
 
     /** 记录已发出的代理通知 ID，用于判断首次发送（触发岛动画）还是后续更新。*/
     private val postedIds = androidx.collection.ArraySet<Int>()
@@ -82,10 +83,10 @@ object IslandDispatcher {
                 ACTION -> {
                     try {
                         val request = IslandRequest.fromIntent(intent)
-                        Log.d("HyperIsland", "$TAG onReceive: title=${request.title}")
+                        module?.log("$TAG: onReceive title=${request.title}")
                         post(appCtx, request)
                     } catch (e: Exception) {
-                        Log.d("HyperIsland", "$TAG onReceive error: ${e.message}")
+                        module?.logError("$TAG: onReceive error: ${e.message}")
                     }
                 }
                 ACTION_CANCEL -> {
@@ -93,7 +94,7 @@ object IslandDispatcher {
                         val notifId = intent.getIntExtra(EXTRA_NOTIF_ID, NOTIF_ID)
                         cancel(appCtx, notifId)
                     } catch (e: Exception) {
-                        Log.d("HyperIsland", "$TAG onReceive cancel error: ${e.message}")
+                        module?.logError("$TAG: onReceive cancel error: ${e.message}")
                     }
                 }
             }
@@ -106,8 +107,9 @@ object IslandDispatcher {
      * 在 SystemUI 进程中注册广播接收器。由 [IslandDispatcherHook] 在 Application.onCreate
      * 后调用。重复调用安全（幂等）。
      */
-    fun register(context: Context) {
+    fun register(context: Context, xposedModule: XposedModule) {
         if (registered) return
+        module = xposedModule
         val appCtx = context.applicationContext ?: context
         createChannel(appCtx)
 
@@ -119,7 +121,7 @@ object IslandDispatcher {
             appCtx.registerReceiver(receiver, filter, PERM, null)
         }
         registered = true
-        Log.d("HyperIsland", "$TAG registered in pid=${android.os.Process.myPid()}")
+        xposedModule.log("$TAG: registered in pid=${android.os.Process.myPid()}")
     }
 
     // ── 公开 API ──────────────────────────────────────────────────────────────
@@ -213,9 +215,7 @@ object IslandDispatcher {
                 notif.extras.putBoolean("hyperisland_preserve_status_bar_small_icon", true)
                 FocusNotifStatusBarIconHook.markDirectProxyPosted(request.timeoutSecs)
             }
-            Log.d("HyperIsland",
-                "$TAG preserve marker written=$shouldPreserveStatusBarSmallIcon: title=${request.title} | notifId=${request.notifId} | showNotification=${request.showNotification}"
-            )
+            module?.log("$TAG: preserve marker=$shouldPreserveStatusBarSmallIcon title=${request.title} | notifId=${request.notifId} | showNotification=${request.showNotification}")
 
             val isFirstPost = !postedIds.contains(request.notifId)
             if (isFirstPost) {
@@ -228,12 +228,9 @@ object IslandDispatcher {
                 nm.notify(request.notifId, notif)
             }
 
-            Log.d("HyperIsland",
-                "$TAG posted(first=$isFirstPost): ${request.title} | ${request.content}" +
-                " | highlight=${request.highlightColor} | dismiss=${request.dismissIsland}"
-            )
+            module?.log("$TAG: posted(first=$isFirstPost): ${request.title} | ${request.content} | highlight=${request.highlightColor} | dismiss=${request.dismissIsland}")
         } catch (e: Exception) {
-            Log.d("HyperIsland", "$TAG post error: ${e.message}")
+            module?.logError("$TAG: post error: ${e.message}")
         }
     }
 
@@ -259,9 +256,9 @@ object IslandDispatcher {
             val nm = context.getSystemService(NotificationManager::class.java) ?: return
             nm.cancel(notifId)
             postedIds.remove(notifId)
-            Log.d("HyperIsland", "$TAG cancel: notifId=$notifId")
+            module?.log("$TAG: cancel notifId=$notifId")
         } catch (e: Exception) {
-            Log.d("HyperIsland", "$TAG cancel error: ${e.message}")
+            module?.logError("$TAG: cancel error: ${e.message}")
         }
     }
 

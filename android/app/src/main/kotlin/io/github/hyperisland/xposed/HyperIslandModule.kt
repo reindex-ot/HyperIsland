@@ -15,8 +15,6 @@ class HyperIslandModule : XposedModule() {
 
     override fun onPackageLoaded(param: PackageLoadedParam) {
         when (param.packageName) {
-            "io.github.hyperisland" ->
-                SelfHook.init(this, param)
 
             "com.android.systemui" -> {
                 IslandDispatcherHook.init(this, param)

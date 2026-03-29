@@ -15,6 +15,8 @@ import java.util.regex.Pattern
  */
 object DownloadHook {
 
+    private const val TAG = "HyperIsland[DownloadHook]"
+
     var extrasField: Field? = null
 
     private val processedNotifications = mutableMapOf<String, NotificationInfo>()
@@ -42,7 +44,7 @@ object DownloadHook {
         val classLoader = param.defaultClassLoader
         val pkg = param.packageName
 
-        module.log("HyperIsland: handleLoadPackage pkg=$pkg")
+        module.log("$TAG: handleLoadPackage pkg=$pkg")
 
         try {
             hookNotificationBuilder(module, classLoader, pkg)
@@ -57,7 +59,7 @@ object DownloadHook {
 
             hookDownloadManagerService(module, classLoader)
         } catch (e: Throwable) {
-            module.log("HyperIsland: Error hooking $pkg: ${e.message}")
+            module.logError("$TAG: Error hooking $pkg: ${e.message}")
         }
     }
 
@@ -81,7 +83,7 @@ object DownloadHook {
                             val title = extras.getCharSequence(Notification.EXTRA_TITLE)?.toString() ?: ""
                             val text = extras.getCharSequence(Notification.EXTRA_TEXT)?.toString() ?: ""
                             val channelId = notif.channelId ?: ""
-                            module.log("HyperIsland: [RAW/Builder] ch=$channelId | title=$title | text=$text | extras=${extras.keySet().joinToString()}")
+                            module.log("$TAG: [RAW/Builder] ch=$channelId | title=$title | text=$text | extras=${extras.keySet().joinToString()}")
                             if (isDownloadNotification(title, text, extras) || channelId.isNotEmpty()) {
                                 val appName = pkg.substringAfterLast(".").replaceFirstChar { it.uppercase() }
                                 val fileName = extractFileName(title, text, extras)
@@ -101,9 +103,9 @@ object DownloadHook {
                                     processedNotifications.entries.removeIf { now - it.value.lastProcessTime > 10000 }
 
                                     if (downloadId <= 0) {
-                                        module.log("HyperIsland: [Builder] extras keys=${extras.keySet().joinToString()}")
+                                        module.log("$TAG: [Builder] extras keys=${extras.keySet().joinToString()}")
                                     }
-                                    module.log("HyperIsland: [Builder] $appName | $fileName | $progress% | id=$downloadId")
+                                    module.log("$TAG: [Builder] $appName | $fileName | $progress% | id=$downloadId")
 
                                     val context = getContext(classLoader)
                                     if (context != null) {
@@ -118,7 +120,7 @@ object DownloadHook {
                     }
                     result
                 }
-                module.log("HyperIsland: Hooked $builderClassName.build()")
+                module.log("$TAG: Hooked $builderClassName.build()")
                 break
             } catch (_: Throwable) {}
         }
@@ -147,7 +149,7 @@ object DownloadHook {
                 chain.proceed()
             }
         } catch (e: Throwable) {
-            module.log("HyperIsland: notify hook failed: ${e.message}")
+            module.logError("$TAG: notify hook failed: ${e.message}")
         }
     }
 
@@ -159,7 +161,7 @@ object DownloadHook {
             val title = extras.getCharSequence(Notification.EXTRA_TITLE)?.toString() ?: ""
             val text = extras.getCharSequence(Notification.EXTRA_TEXT)?.toString() ?: ""
             val channelId = notif.channelId ?: ""
-            module.log("HyperIsland: [RAW/Notify] ch=$channelId | title=$title | text=$text")
+            module.log("$TAG: [RAW/Notify] ch=$channelId | title=$title | text=$text")
             if (!isDownloadNotification(title, text, extras) && channelId.isEmpty()) return
 
             val appName = pkg.substringAfterLast(".").replaceFirstChar { it.uppercase() }
@@ -178,7 +180,7 @@ object DownloadHook {
             if (downloadId > 0) { info.downloadId = downloadId; downloadIdMap[downloadId] = pkg }
             processedNotifications.entries.removeIf { now - it.value.lastProcessTime > 10000 }
 
-            module.log("HyperIsland: [Notify] $appName | $fileName | $progress% | notifId=$id | tag=$tag | downloadId=$downloadId")
+            module.log("$TAG: [Notify] $appName | $fileName | $progress% | notifId=$id | tag=$tag | downloadId=$downloadId")
 
             val context = getContext(classLoader) ?: return
             InProcessController.ensureRegistered(context, module)
@@ -228,7 +230,7 @@ object DownloadHook {
             }
 
         } catch (e: Throwable) {
-            module.log("HyperIsland: handleNotification error: ${e.message}")
+            module.logError("$TAG: handleNotification error: ${e.message}")
         }
     }
 
@@ -255,7 +257,7 @@ object DownloadHook {
                 }
             } catch (_: ClassNotFoundException) {
             } catch (e: Throwable) {
-                module.log("HyperIsland: DownloadManager hook error ($className): ${e.message}")
+                module.logError("$TAG: DownloadManager hook error ($className): ${e.message}")
             }
         }
     }
@@ -264,7 +266,7 @@ object DownloadHook {
         try {
             val method = clazz.getDeclaredMethod(methodName)
             module.hook(method).intercept { chain ->
-                module.log("HyperIsland: [$label] $methodName called")
+                module.log("$TAG: [$label] $methodName called")
                 chain.proceed()
             }
         } catch (_: Throwable) {}

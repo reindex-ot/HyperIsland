@@ -3,7 +3,6 @@ package io.github.hyperisland.xposed.templates
 import android.content.Context
 import android.graphics.drawable.Icon
 import android.os.Bundle
-import android.util.Log
 import io.github.d4viddf.hyperisland_kit.HyperAction
 import io.github.d4viddf.hyperisland_kit.HyperIslandNotification
 import io.github.d4viddf.hyperisland_kit.HyperPicture
@@ -13,6 +12,9 @@ import io.github.d4viddf.hyperisland_kit.models.PicInfo
 import io.github.d4viddf.hyperisland_kit.models.TextInfo
 import io.github.hyperisland.xposed.ConfigManager
 import io.github.hyperisland.xposed.IslandDispatcher
+import io.github.hyperisland.xposed.log
+import io.github.hyperisland.xposed.logError
+import io.github.hyperisland.xposed.logWarn
 import io.github.hyperisland.xposed.IslandRequest
 import io.github.hyperisland.xposed.IslandTemplate
 import io.github.hyperisland.xposed.IslandViewModel
@@ -37,6 +39,7 @@ import java.util.concurrent.TimeoutException
  */
 object AINotificationIslandNotification : IslandTemplate {
 
+    private const val TAG = "HyperIsland[AINotifIsland]"
     const val TEMPLATE_ID = "ai_notification_island"
 
     override val id = TEMPLATE_ID
@@ -52,11 +55,10 @@ object AINotificationIslandNotification : IslandTemplate {
         val leftText  = aiText?.left  ?: data.title
         val rightText = aiText?.right ?: data.subtitle.ifEmpty { data.title }
 
-        if (aiText != null) {
-            Log.d("HyperIsland", "HyperIsland[AINotifIsland]: AI text — left=$leftText | right=$rightText")
-        } else {
-            Log.d("HyperIsland", "HyperIsland[AINotifIsland]: Using fallback text — left=$leftText | right=$rightText")
-        }
+        ConfigManager.module()?.log(
+            if (aiText != null) "$TAG: AI text — left=$leftText | right=$rightText"
+            else "$TAG: fallback text — left=$leftText | right=$rightText"
+        )
 
         if (data.focusNotif == "off") {
             injectViaDispatcher(context, data, leftText, rightText)
@@ -65,11 +67,9 @@ object AINotificationIslandNotification : IslandTemplate {
         try {
             val vm = process(context, data, leftText, rightText)
             resolveRenderer(data.renderer).render(context, extras, vm)
-            Log.d("HyperIsland",
-                "HyperIsland[AINotifIsland]: Injected — title=${data.title} | left=$leftText | right=$rightText | notifId=${data.notifId}"
-            )
+            //ConfigManager.module()?.log("$TAG: injected — title=${data.title} | left=$leftText | right=$rightText | notifId=${data.notifId}")
         } catch (e: Exception) {
-            Log.d("HyperIsland", "HyperIsland[AINotifIsland]: Injection error: ${e.message}")
+            ConfigManager.module()?.logError("$TAG: injection error: ${e.message}")
         }
     }
 
@@ -101,10 +101,10 @@ object AINotificationIslandNotification : IslandTemplate {
             future.get(3, TimeUnit.SECONDS)
         } catch (_: TimeoutException) {
             future.cancel(true)
-            Log.d("HyperIsland", "HyperIsland[AINotifIsland]: AI request timed out, falling back")
+            ConfigManager.module()?.logWarn("$TAG: AI request timed out, falling back")
             null
         } catch (e: Exception) {
-            Log.d("HyperIsland", "HyperIsland[AINotifIsland]: AI request error: ${e.message}")
+            ConfigManager.module()?.logError("$TAG: AI request error: ${e.message}")
             null
         }
     }
@@ -120,13 +120,13 @@ object AINotificationIslandNotification : IslandTemplate {
             readTimeout    = 2500
             doOutput       = true
         }
-        Log.d("HyperIsland", "HyperIsland[AINotifIsland]: POST ${config.url}")
+        ConfigManager.module()?.log("$TAG: POST ${config.url}")
         return try {
             conn.outputStream.use { it.write(requestBody.toByteArray(Charsets.UTF_8)) }
             val code = conn.responseCode
             if (code != HttpURLConnection.HTTP_OK) {
                 val errorBody = try { conn.errorStream?.bufferedReader(Charsets.UTF_8)?.use { it.readText() } ?: "" } catch (_: Exception) { "" }
-                Log.d("HyperIsland", "HyperIsland[AINotifIsland]: HTTP $code — $errorBody")
+                ConfigManager.module()?.logError("$TAG: HTTP $code — $errorBody")
                 return null
             }
             parseAiResponse(conn.inputStream.bufferedReader(Charsets.UTF_8).use { it.readText() })
@@ -172,7 +172,7 @@ object AINotificationIslandNotification : IslandTemplate {
             if (left.isEmpty() && right.isEmpty()) null
             else AiIslandText(left.ifEmpty { "通知" }, right.ifEmpty { "新消息" })
         } catch (e: Exception) {
-            Log.d("HyperIsland", "HyperIsland[AINotifIsland]: Failed to parse AI response: ${e.message}")
+            ConfigManager.module()?.logError("$TAG: failed to parse AI response: ${e.message}")
             null
         }
     }
@@ -205,7 +205,7 @@ object AINotificationIslandNotification : IslandTemplate {
                 ),
             )
         } catch (e: Exception) {
-            Log.d("HyperIsland", "HyperIsland[AINotifIsland]: Dispatcher error: ${e.message}")
+            ConfigManager.module()?.logError("$TAG: dispatcher error: ${e.message}")
         }
     }
 

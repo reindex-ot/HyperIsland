@@ -5,9 +5,11 @@ import android.graphics.drawable.Icon
 import android.os.Bundle
 import android.util.Log
 import io.github.hyperisland.R
+import io.github.hyperisland.xposed.ConfigManager
 import io.github.hyperisland.xposed.IslandTemplate
 import io.github.hyperisland.xposed.IslandViewModel
 import io.github.hyperisland.xposed.NotifData
+import io.github.hyperisland.xposed.logError
 import io.github.hyperisland.xposed.moduleContext
 import io.github.hyperisland.xposed.renderer.ImageTextWithButtonsRenderer
 import io.github.hyperisland.xposed.renderer.resolveRenderer
@@ -19,8 +21,9 @@ import io.github.hyperisland.xposed.toRounded
  *
  * 消息处理（[process]）与渲染（[ImageTextWithButtonsRenderer]/[ImageTextWithButtonsWrapRenderer]）分离。
  */
-object GenericProgressIslandNotification : IslandTemplate {
+object GenericDownloadIslandNotification : IslandTemplate {
 
+    private const val TAG = "HyperIsland[DownloadIsland]"
     const val TEMPLATE_ID = "generic_progress"
 
     override val id = TEMPLATE_ID
@@ -34,9 +37,9 @@ object GenericProgressIslandNotification : IslandTemplate {
                 vm.updatable                -> "in-progress"
                 else                        -> "done/paused"
             }
-            Log.d("HyperIsland", "HyperIsland[Generic]: injected — ${data.title} ($stateTag) buttons=${data.actions.size}")
+            //module.log("$TAG: injected — ${data.title} ($stateTag) buttons=${data.actions.size}")
         } catch (e: Exception) {
-            Log.d("HyperIsland", "HyperIsland[Generic]: Island injection error: ${e.message}")
+            ConfigManager.module()?.logError("$TAG: injection error: ${e.message}")
         }
     }
 

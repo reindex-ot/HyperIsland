@@ -1,17 +1,7 @@
 package io.github.hyperisland.xposed
 
 import android.content.SharedPreferences
-import android.util.Log
 import io.github.libxposed.api.XposedModule
-
-fun XposedModule.log(message: String) =
-    log(Log.DEBUG, "HyperIsland", message)
-
-fun XposedModule.logWarn(message: String) =
-    log(Log.WARN, "HyperIsland", message)
-
-fun XposedModule.logError(message: String) =
-    log(Log.ERROR, "HyperIsland", message)
 
 /**
  * 基于 XposedService.getRemotePreferences 的配置管理器（API 101 版本）。
@@ -92,6 +82,9 @@ object ConfigManager {
 
     fun contains(key: String): Boolean =
         prefs?.contains(fk(key)) ?: false
+
+    /** 供同进程内其他组件（如 template）获取 module 引用以写日志。 */
+    fun module(): XposedModule? = module
 
     // ── 内部实现 ────────────────────────────────────────────────────────────────
 

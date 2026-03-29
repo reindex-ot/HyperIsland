@@ -4,9 +4,11 @@ import android.content.Context
 import android.graphics.drawable.Icon
 import android.os.Bundle
 import android.util.Log
+import io.github.hyperisland.xposed.ConfigManager
 import io.github.hyperisland.xposed.IslandTemplate
 import io.github.hyperisland.xposed.IslandViewModel
 import io.github.hyperisland.xposed.NotifData
+import io.github.hyperisland.xposed.logError
 import io.github.hyperisland.xposed.renderer.ImageTextWithButtonsRenderer
 import io.github.hyperisland.xposed.renderer.resolveRenderer
 import io.github.hyperisland.xposed.renderer.ImageTextWithRightTextButtonRenderer
@@ -20,6 +22,7 @@ import io.github.hyperisland.xposed.toRounded
  */
 object DownloadLiteIslandNotification : IslandTemplate {
 
+    private const val TAG = "HyperIsland[DownloadIslandLite]"
     const val TEMPLATE_ID = "download_lite"
 
     override val id = TEMPLATE_ID
@@ -33,9 +36,9 @@ object DownloadLiteIslandNotification : IslandTemplate {
                 !vm.updatable               -> "done"
                 else                        -> "paused"
             }
-            Log.d("HyperIsland", "HyperIsland[DownloadLite]: injected — ${data.title} ($stateTag) buttons=${data.actions.size}")
+            //module.log("$TAG: "HyperIsland[DownloadLite]: injected — ${data.title} ($stateTag) buttons=${data.actions.size}")
         } catch (e: Exception) {
-            Log.d("HyperIsland", "HyperIsland[DownloadLite]: Island injection error: ${e.message}")
+            ConfigManager.module()?.logError("$TAG: injection error: ${e.message}")
         }
     }
 

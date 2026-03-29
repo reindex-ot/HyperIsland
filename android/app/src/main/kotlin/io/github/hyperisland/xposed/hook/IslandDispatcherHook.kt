@@ -11,6 +11,8 @@ import io.github.libxposed.api.XposedModule
  */
 object IslandDispatcherHook {
 
+    private const val TAG = "HyperIsland[DispatcherHook]"
+
     fun init(module: XposedModule, param: PackageLoadedParam) {
         try {
             val method = param.defaultClassLoader
@@ -20,14 +22,14 @@ object IslandDispatcherHook {
                 val result = chain.proceed()
                 val app = chain.thisObject as? android.app.Application
                 if (app != null) {
-                    IslandDispatcher.register(app)
+                    IslandDispatcher.register(app, module)
                     ConfigManager.init(module)
                 }
                 result
             }
-            module.log("HyperIsland[DispatcherHook]: hooked Application.onCreate in SystemUI")
+            module.log("$TAG: hooked Application.onCreate in SystemUI")
         } catch (e: Throwable) {
-            module.log("HyperIsland[DispatcherHook]: hook failed: ${e.message}")
+            module.logError("$TAG: hook failed: ${e.message}")
         }
     }
 }

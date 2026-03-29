@@ -4,23 +4,23 @@ import android.content.Context
 import android.os.Bundle
 import io.github.hyperisland.xposed.templates.AINotificationIslandNotification
 import io.github.hyperisland.xposed.templates.DownloadLiteIslandNotification
-import io.github.hyperisland.xposed.templates.GenericProgressIslandNotification
+import io.github.hyperisland.xposed.templates.GenericDownloadIslandNotification
 import io.github.hyperisland.xposed.templates.NotificationIslandLiteNotification
 import io.github.hyperisland.xposed.templates.NotificationIslandNotification
-import android.util.Log
-
 /**
  * 模板注册表。
  *
  * 将模板 ID 映射到对应的 [IslandTemplate] 实现；
- * 未知 ID 时自动降级到 [GenericProgressIslandNotification]。
+ * 未知 ID 时自动降级到 [GenericDownloadIslandNotification]。
  *
  * 新增模板只需在 [registry] 中添加一行，不改动 Hook 代码。
  */
 object TemplateRegistry {
 
+    private const val TAG = "HyperIsland[TemplateRegistry]"
+
     private val registry: Map<String, IslandTemplate> = listOf<IslandTemplate>(
-        GenericProgressIslandNotification,
+        GenericDownloadIslandNotification,
         NotificationIslandNotification,
         NotificationIslandLiteNotification,
         DownloadLiteIslandNotification,
@@ -35,7 +35,7 @@ object TemplateRegistry {
     ) {
         val template = registry[templateId]
         if (template == null) {
-            Log.d("HyperIsland", "HyperIsland[Registry]: unknown template '$templateId', skipped")
+            ConfigManager.module()?.logWarn("$TAG: unknown template '$templateId', skipped")
             return
         }
         // 通知进入黑名单处理

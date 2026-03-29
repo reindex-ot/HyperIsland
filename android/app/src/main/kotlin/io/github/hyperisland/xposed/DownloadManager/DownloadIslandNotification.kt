@@ -14,7 +14,8 @@ import io.github.hyperisland.R
 import io.github.hyperisland.xposed.ConfigManager
 import io.github.hyperisland.xposed.InProcessController
 import io.github.hyperisland.xposed.moduleContext
-import android.util.Log
+import io.github.hyperisland.xposed.log
+import io.github.hyperisland.xposed.logError
 import io.github.libxposed.api.XposedModule
 import io.github.d4viddf.hyperisland_kit.HyperAction
 import io.github.d4viddf.hyperisland_kit.HyperIslandNotification
@@ -40,6 +41,7 @@ import io.github.hyperisland.xposed.renderer.wrapLongTextJson
  */
 object DownloadIslandNotification {
 
+    private const val TAG = "HyperIsland[Download]"
     private enum class IconType { DOWNLOADING }
 
     /**
@@ -211,10 +213,10 @@ object DownloadIslandNotification {
                 hasValidProgress -> "${safeProgress}%"
                 else             -> "unknown"
             }
-            Log.d("HyperIsland", "HyperIsland[Download]: Island injected — $fileName ($stateTag)")
+            ConfigManager.module()?.log("$TAG: injected — $fileName ($stateTag)")
 
         } catch (e: Exception) {
-            Log.d("HyperIsland", "HyperIsland[Download]: Island injection error: ${e.message}")
+            ConfigManager.module()?.logError("$TAG: injection error: ${e.message}")
         }
     }
 

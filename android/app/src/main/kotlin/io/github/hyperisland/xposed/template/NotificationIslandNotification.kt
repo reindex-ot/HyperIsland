@@ -3,8 +3,10 @@ package io.github.hyperisland.xposed.templates
 import android.content.Context
 import android.graphics.drawable.Icon
 import android.os.Bundle
-import android.util.Log
+import io.github.hyperisland.xposed.ConfigManager
 import io.github.hyperisland.xposed.IslandDispatcher
+import io.github.hyperisland.xposed.log
+import io.github.hyperisland.xposed.logError
 import io.github.hyperisland.xposed.IslandRequest
 import io.github.hyperisland.xposed.IslandTemplate
 import io.github.hyperisland.xposed.IslandViewModel
@@ -24,6 +26,7 @@ import io.github.hyperisland.xposed.toRounded
  */
 object NotificationIslandNotification : IslandTemplate {
 
+    private const val TAG = "HyperIsland[NotifIsland]"
     const val TEMPLATE_ID = "notification_island"
 
     override val id = TEMPLATE_ID
@@ -36,11 +39,9 @@ object NotificationIslandNotification : IslandTemplate {
         try {
             val vm = process(context, data)
             resolveRenderer(data.renderer).render(context, extras, vm)
-            Log.d("HyperIsland",
-                "HyperIsland[NotifIsland]: injected — ${data.title} | left=${vm.leftTitle} | right=${vm.rightTitle} | buttons=${data.actions.size} | isOngoing=${data.isOngoing}"
-            )
+            //ConfigManager.module()?.log("$TAG: injected — ${data.title} | left=${vm.leftTitle} | right=${vm.rightTitle} | buttons=${data.actions.size} | isOngoing=${data.isOngoing}")
         } catch (e: Exception) {
-            Log.d("HyperIsland", "HyperIsland[NotifIsland]: Island injection error: ${e.message}")
+            ConfigManager.module()?.logError("$TAG: injection error: ${e.message}")
         }
     }
 
@@ -72,9 +73,9 @@ object NotificationIslandNotification : IslandTemplate {
                     actions          = data.actions.take(2),
                 ),
             )
-            Log.d("HyperIsland", "HyperIsland[NotifIsland]: Dispatcher island — ${data.title} | iconMode=${data.iconMode} | timeout=${data.islandTimeout}")
+            //ConfigManager.module()?.log("$TAG: dispatcher island — ${data.title} | iconMode=${data.iconMode} | timeout=${data.islandTimeout}")
         } catch (e: Exception) {
-            Log.d("HyperIsland", "HyperIsland[NotifIsland]: Dispatcher island error: ${e.message}")
+            ConfigManager.module()?.logError("$TAG: dispatcher island error: ${e.message}")
         }
     }
 
