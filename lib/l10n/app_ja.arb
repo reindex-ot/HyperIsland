@@ -59,8 +59,8 @@
   "alreadyLatest": "最新のバージョンを使用しています",
   "roundIconTitle": "アイコンの角を丸める",
   "roundIconSubtitle": "通知アイコンの角を丸めます",
-  "marqueeChannelTitle": "Island のテキストをスクロール",
-  "marqueeSpeedTitle": "速度 ",
+  "marqueeChannelTitle": "Island のテキストをスクロール ",
+  "marqueeSpeedTitle": " 速度 ",
   "marqueeSpeedLabel": "{speed} px/秒",
   "@marqueeSpeedLabel": {
     "placeholders": {
