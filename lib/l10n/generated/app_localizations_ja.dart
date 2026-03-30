@@ -184,10 +184,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get roundIconSubtitle => '通知アイコンの角を丸めます';
 
   @override
-  String get marqueeChannelTitle => 'Island のテキストをスクロール';
+  String get marqueeChannelTitle => 'Island のテキストをスクロール ';
 
   @override
-  String get marqueeSpeedTitle => '速度 ';
+  String get marqueeSpeedTitle => ' 速度 ';
 
   @override
   String marqueeSpeedLabel(int speed) {
