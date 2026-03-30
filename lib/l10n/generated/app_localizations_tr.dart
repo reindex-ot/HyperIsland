@@ -492,11 +492,11 @@ class AppLocalizationsTr extends AppLocalizations {
       'Odaklanmış bildirim açıkken durum çubuğu küçük simgesinin zorla korunup korunmayacağı';
 
   @override
-  String get hideIslandIconLabel => 'Büyük ada simgesini gizle';
+  String get islandIconLabel => 'Büyük ada simgesi';
 
   @override
-  String get hideIslandIconLabelSubtitle =>
-      'Adanın büyük simgesini gizler (küçük ada etkilenmez)';
+  String get islandIconLabelSubtitle =>
+      'Etkinleştirildiğinde adanın büyük simgesini gösterir (küçük ada etkilenmez)';
 
   @override
   String get firstFloatLabel => 'İlk Açılış';

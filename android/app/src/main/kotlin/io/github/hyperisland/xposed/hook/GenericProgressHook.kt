@@ -246,7 +246,7 @@ object GenericProgressHook {
             val defaultMarquee           = loadBooleanSetting("global:default_marquee",            "pref_default_marquee",            false)
             val defaultFocusNotif        = loadBooleanSetting("global:default_focus_notif",        "pref_default_focus_notif",        true)
             val defaultPreserveSmallIcon = loadBooleanSetting("global:default_preserve_small_icon","pref_default_preserve_small_icon", false)
-            val defaultHideIslandIcon    = loadBooleanSetting("global:default_hide_island_icon",   "pref_default_hide_island_icon",   false)
+            val defaultShowIslandIcon    = loadBooleanSetting("global:default_show_island_icon",   "pref_default_show_island_icon",   true)
 
             val focusNotif = resolveTriOpt(
                 loadChannelStringSetting("focus:$pkg/$channelId", "pref_channel_focus_${pkg}_$channelId", "default"),
@@ -256,9 +256,9 @@ object GenericProgressHook {
                 loadChannelStringSetting("preserve_small_icon:$pkg/$channelId", "pref_channel_preserve_small_icon_${pkg}_$channelId", "default"),
                 defaultPreserveSmallIcon
             )
-            val hideIslandIcon = resolveTriOpt(
-                loadChannelStringSetting("hide_island_icon:$pkg/$channelId", "pref_channel_hide_island_icon_${pkg}_$channelId", "default"),
-                defaultHideIslandIcon
+            val showIslandIcon = resolveTriOpt(
+                loadChannelStringSetting("show_island_icon:$pkg/$channelId", "pref_channel_show_island_icon_${pkg}_$channelId", "default"),
+                defaultShowIslandIcon
             )
             val firstFloat = resolveTriOpt(
                 loadChannelStringSetting("first_float:$pkg/$channelId", "pref_channel_first_float_${pkg}_$channelId", "default"),
@@ -311,7 +311,7 @@ object GenericProgressHook {
                     focusIconMode   = focusIconMode,
                     focusNotif      = focusNotif,
                     preserveStatusBarSmallIcon = preserveStatusBarSmallIcon,
-                    hideIslandIcon  = hideIslandIcon,
+                    showIslandIcon  = showIslandIcon,
                     firstFloat      = firstFloat,
                     enableFloatMode = enableFloatMode,
                     islandTimeout   = islandTimeout,

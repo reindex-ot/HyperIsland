@@ -930,17 +930,17 @@ abstract class AppLocalizations {
   /// **'焦点通知打开时，是否强制保留状态栏小图标'**
   String get preserveStatusBarSmallIconLabelSubtitle;
 
-  /// No description provided for @hideIslandIconLabel.
+  /// No description provided for @islandIconLabel.
   ///
   /// In zh, this message translates to:
-  /// **'隐藏大岛图标'**
-  String get hideIslandIconLabel;
+  /// **'大岛图标'**
+  String get islandIconLabel;
 
-  /// No description provided for @hideIslandIconLabelSubtitle.
+  /// No description provided for @islandIconLabelSubtitle.
   ///
   /// In zh, this message translates to:
-  /// **'隐藏超级岛的大图标（小岛不受影响）'**
-  String get hideIslandIconLabelSubtitle;
+  /// **'开启后显示超级岛的大图标（小岛不受影响）'**
+  String get islandIconLabelSubtitle;
 
   /// No description provided for @firstFloatLabel.
   ///

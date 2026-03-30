@@ -222,9 +222,9 @@ class _AppChannelsPageState extends State<AppChannelsPage> {
     );
   }
 
-  Future<void> _setHideIslandIcon(String channelId, String value) async {
-    _updateExtra(channelId, 'hide_island_icon', value);
-    await widget.controller.setChannelHideIslandIcon(
+  Future<void> _setShowIslandIcon(String channelId, String value) async {
+    _updateExtra(channelId, 'show_island_icon', value);
+    await widget.controller.setChannelShowIslandIcon(
       widget.app.packageName,
       channelId,
       value,
@@ -254,8 +254,8 @@ class _AppChannelsPageState extends State<AppChannelsPage> {
     if (settings['preserve_small_icon'] case final v?) {
       await _setPreserveSmallIcon(channelId, v);
     }
-    if (settings['hide_island_icon'] case final v?) {
-      await _setHideIslandIcon(channelId, v);
+    if (settings['show_island_icon'] case final v?) {
+      await _setShowIslandIcon(channelId, v);
     }
     if (settings['first_float'] case final v?) {
       await _setFirstFloat(channelId, v);
@@ -513,8 +513,8 @@ class _AppChannelsPageState extends State<AppChannelsPage> {
                     focusNotif: extras['focus'] ?? kTriOptDefault,
                     preserveSmallIcon:
                         extras['preserve_small_icon'] ?? kTriOptDefault,
-                    hideIslandIcon:
-                        extras['hide_island_icon'] ?? kTriOptDefault,
+                    showIslandIcon:
+                        extras['show_island_icon'] ?? kTriOptDefault,
                     firstFloat: extras['first_float'] ?? kTriOptDefault,
                     enableFloat: extras['enable_float'] ?? kTriOptDefault,
                     islandTimeout: extras['timeout'] ?? '5',
@@ -550,7 +550,7 @@ class _ChannelTile extends StatelessWidget {
     required this.focusIconMode,
     required this.focusNotif,
     required this.preserveSmallIcon,
-    required this.hideIslandIcon,
+    required this.showIslandIcon,
     required this.firstFloat,
     required this.enableFloat,
     required this.islandTimeout,
@@ -573,7 +573,7 @@ class _ChannelTile extends StatelessWidget {
   final String focusIconMode;
   final String focusNotif;
   final String preserveSmallIcon;
-  final String hideIslandIcon;
+  final String showIslandIcon;
   final String firstFloat;
   final String enableFloat;
   final String islandTimeout;
@@ -592,7 +592,7 @@ class _ChannelTile extends StatelessWidget {
         focusIconMode: focusIconMode,
         focusNotif: focusNotif,
         preserveSmallIcon: preserveSmallIcon,
-        hideIslandIcon: hideIslandIcon,
+        showIslandIcon: showIslandIcon,
         firstFloat: firstFloat,
         enableFloat: enableFloat,
         islandTimeout: islandTimeout,

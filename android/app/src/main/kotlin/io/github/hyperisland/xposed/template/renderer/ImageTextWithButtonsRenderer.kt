@@ -66,7 +66,7 @@ object ImageTextWithButtonsRenderer : IslandRenderer {
             }
 
             // 大岛
-            val leftSide = if (vm.hideIslandIcon) {
+            val leftSide = if (!vm.showIslandIcon) {
                 ImageTextInfoLeft(
                     type     = 1,
                     textInfo = TextInfo(title = vm.leftTitle),

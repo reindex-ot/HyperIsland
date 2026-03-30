@@ -436,10 +436,10 @@ class _SettingsPageState extends State<SettingsPage> {
                             horizontal: 16,
                             vertical: 4,
                           ),
-                          title: Text(l10n.hideIslandIconLabel),
-                          subtitle: Text(l10n.hideIslandIconLabelSubtitle),
-                          value: _ctrl.defaultHideIslandIcon,
-                          onChanged: _ctrl.setDefaultHideIslandIcon,
+                          title: Text(l10n.islandIconLabel),
+                          subtitle: Text(l10n.islandIconLabelSubtitle),
+                          value: _ctrl.defaultShowIslandIcon,
+                          onChanged: _ctrl.setDefaultShowIslandIcon,
                           shape: const RoundedRectangleBorder(
                             borderRadius: BorderRadius.vertical(
                               bottom: Radius.circular(16),

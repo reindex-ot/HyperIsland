@@ -471,11 +471,11 @@ class AppLocalizationsJa extends AppLocalizations {
       'フォーカス通知を表示時にステータスバーアイコンを強制的に保持します';
 
   @override
-  String get hideIslandIconLabel => '大きなアイコンを非表示';
+  String get islandIconLabel => '大きなアイコン';
 
   @override
-  String get hideIslandIconLabelSubtitle =>
-      'Island の大きなアイコンを非表示にします（小さなアイコンは影響を受けません）';
+  String get islandIconLabelSubtitle =>
+      '有効にすると Island の大きなアイコンを表示します（小さなアイコンは影響を受けません）';
 
   @override
   String get firstFloatLabel => '最初にフロート表示';

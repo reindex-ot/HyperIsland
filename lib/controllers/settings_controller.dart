@@ -16,7 +16,7 @@ const kPrefDefaultEnableFloat = 'pref_default_enable_float';
 const kPrefDefaultMarquee = 'pref_default_marquee';
 const kPrefDefaultFocusNotif = 'pref_default_focus_notif';
 const kPrefDefaultPreserveSmallIcon = 'pref_default_preserve_small_icon';
-const kPrefDefaultHideIslandIcon = 'pref_default_hide_island_icon';
+const kPrefDefaultShowIslandIcon = 'pref_default_show_island_icon';
 
 const kPrefAiEnabled = 'pref_ai_enabled';
 const kPrefAiUrl = 'pref_ai_url';
@@ -46,7 +46,7 @@ class SettingsController extends ChangeNotifier {
   bool defaultMarquee = false;
   bool defaultFocusNotif = true;
   bool defaultPreserveSmallIcon = false;
-  bool defaultHideIslandIcon = false;
+  bool defaultShowIslandIcon = true;
   bool aiEnabled = false;
   String aiUrl = '';
   String aiApiKey = '';
@@ -74,7 +74,7 @@ class SettingsController extends ChangeNotifier {
     defaultFocusNotif = prefs.getBool(kPrefDefaultFocusNotif) ?? true;
     defaultPreserveSmallIcon =
         prefs.getBool(kPrefDefaultPreserveSmallIcon) ?? false;
-    defaultHideIslandIcon = prefs.getBool(kPrefDefaultHideIslandIcon) ?? false;
+    defaultShowIslandIcon = prefs.getBool(kPrefDefaultShowIslandIcon) ?? true;
     aiEnabled = prefs.getBool(kPrefAiEnabled) ?? false;
     aiUrl = prefs.getString(kPrefAiUrl) ?? '';
     aiApiKey = prefs.getString(kPrefAiApiKey) ?? '';
@@ -185,10 +185,10 @@ class SettingsController extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> setDefaultHideIslandIcon(bool value) async {
+  Future<void> setDefaultShowIslandIcon(bool value) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(kPrefDefaultHideIslandIcon, value);
-    defaultHideIslandIcon = value;
+    await prefs.setBool(kPrefDefaultShowIslandIcon, value);
+    defaultShowIslandIcon = value;
     notifyListeners();
   }
 

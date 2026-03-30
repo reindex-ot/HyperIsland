@@ -466,10 +466,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get preserveStatusBarSmallIconLabelSubtitle => '焦点通知打开时，是否强制保留状态栏小图标';
 
   @override
-  String get hideIslandIconLabel => '隐藏大岛图标';
+  String get islandIconLabel => '大岛图标';
 
   @override
-  String get hideIslandIconLabelSubtitle => '隐藏超级岛的大图标（小岛不受影响）';
+  String get islandIconLabelSubtitle => '开启后显示超级岛的大图标（小岛不受影响）';
 
   @override
   String get firstFloatLabel => '初次展开';

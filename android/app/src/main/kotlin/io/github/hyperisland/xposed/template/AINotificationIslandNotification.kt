@@ -262,7 +262,7 @@ $userPrompt
             enableFloat       = data.enableFloatMode == "on",
             timeoutSecs       = data.islandTimeout,
             isOngoing         = data.isOngoing,
-            hideIslandIcon    = data.hideIslandIcon == "on",
+            showIslandIcon    = data.showIslandIcon == "on",
         )
     }
 
