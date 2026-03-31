@@ -203,15 +203,27 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final l10n = AppLocalizations.of(context)!;
+    const titleStyle = TextStyle(fontWeight: FontWeight.w500);
 
     return Scaffold(
       backgroundColor: cs.surface,
       body: CustomScrollView(
         slivers: [
-          SliverAppBar.large(
-            title: Text(l10n.navSettings),
+          SliverAppBar(
+            pinned: true,
+            floating: true,
+            expandedHeight: 130,
             backgroundColor: cs.surface,
-            centerTitle: false,
+            flexibleSpace: FlexibleSpaceBar(
+              titlePadding: const EdgeInsets.only(left: 26, bottom: 16),
+              title: Text(
+                l10n.navSettings,
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+            ),
           ),
           if (_ctrl.loading)
             const SliverFillRemaining(
@@ -222,7 +234,10 @@ class _SettingsPageState extends State<SettingsPage> {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               sliver: SliverList(
                 delegate: SliverChildListDelegate([
-                  SectionLabel(l10n.aiConfigSection),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 18, top: 8),
+                    child: SectionLabel(l10n.aiConfigSection),
+                  ),
                   const SizedBox(height: 8),
                   Card(
                     elevation: 0,
@@ -239,7 +254,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         borderRadius: BorderRadius.circular(16),
                       ),
                       leading: const Icon(Icons.psychology_outlined),
-                      title: Text(l10n.aiConfigTitle),
+                      title: Text(l10n.aiConfigTitle, style: titleStyle),
                       subtitle: Text(
                         _ctrl.aiEnabled
                             ? l10n.aiConfigSubtitleEnabled
@@ -254,8 +269,11 @@ class _SettingsPageState extends State<SettingsPage> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 24),
-                  SectionLabel(l10n.navBlacklist),
+                  const SizedBox(height: 8), // 修改2: 减小间距以保持一致性
+                  Padding(
+                    padding: const EdgeInsets.only(left: 18),
+                    child: SectionLabel(l10n.navBlacklist),
+                  ),
                   const SizedBox(height: 8),
                   Card(
                     elevation: 0,
@@ -276,7 +294,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             ),
                           ),
                           leading: const Icon(Icons.block),
-                          title: Text(l10n.navBlacklist),
+                          title: Text(l10n.navBlacklist, style: titleStyle),
                           subtitle: Text(l10n.navBlacklistSubtitle),
                           trailing: const Icon(Icons.chevron_right),
                           onTap: () {
@@ -291,8 +309,11 @@ class _SettingsPageState extends State<SettingsPage> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 24),
-                  SectionLabel(l10n.behaviorSection),
+                  const SizedBox(height: 8),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 18),
+                    child: SectionLabel(l10n.behaviorSection),
+                  ),
                   const SizedBox(height: 8),
                   Card(
                     elevation: 0,
@@ -307,7 +328,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             horizontal: 16,
                             vertical: 4,
                           ),
-                          title: Text(l10n.keepFocusNotifTitle),
+                          title: Text(l10n.keepFocusNotifTitle, style: titleStyle),
                           subtitle: Text(l10n.keepFocusNotifSubtitle),
                           value: _ctrl.resumeNotification,
                           onChanged: _onResumeNotificationChanged,
@@ -323,7 +344,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             horizontal: 16,
                             vertical: 4,
                           ),
-                          title: Text(l10n.unlockAllFocusTitle),
+                          title: Text(l10n.unlockAllFocusTitle, style: titleStyle),
                           subtitle: Text(l10n.unlockAllFocusSubtitle),
                           value: _ctrl.unlockAllFocus,
                           onChanged: _ctrl.setUnlockAllFocus,
@@ -334,7 +355,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             horizontal: 16,
                             vertical: 4,
                           ),
-                          title: Text(l10n.unlockFocusAuthTitle),
+                          title: Text(l10n.unlockFocusAuthTitle, style: titleStyle),
                           subtitle: Text(l10n.unlockFocusAuthSubtitle),
                           value: _ctrl.unlockFocusAuth,
                           onChanged: _ctrl.setUnlockFocusAuth,
@@ -345,7 +366,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             horizontal: 16,
                             vertical: 4,
                           ),
-                          title: Text(l10n.checkUpdateOnLaunchTitle),
+                          title: Text(l10n.checkUpdateOnLaunchTitle, style: titleStyle),
                           subtitle: Text(l10n.checkUpdateOnLaunchSubtitle),
                           value: _ctrl.checkUpdateOnLaunch,
                           onChanged: _ctrl.setCheckUpdateOnLaunch,
@@ -358,8 +379,11 @@ class _SettingsPageState extends State<SettingsPage> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 24),
-                  SectionLabel(l10n.defaultConfigSection),
+                  const SizedBox(height: 8),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 18),
+                    child: SectionLabel(l10n.defaultConfigSection),
+                  ),
                   const SizedBox(height: 8),
                   Card(
                     elevation: 0,
@@ -374,7 +398,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             horizontal: 16,
                             vertical: 4,
                           ),
-                          title: Text(l10n.firstFloatLabel),
+                          title: Text(l10n.firstFloatLabel, style: titleStyle),
                           subtitle: Text(l10n.firstFloatLabelSubtitle),
                           value: _ctrl.defaultFirstFloat,
                           onChanged: _ctrl.setDefaultFirstFloat,
@@ -390,7 +414,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             horizontal: 16,
                             vertical: 4,
                           ),
-                          title: Text(l10n.updateFloatLabel),
+                          title: Text(l10n.updateFloatLabel, style: titleStyle),
                           subtitle: Text(l10n.updateFloatLabelSubtitle),
                           value: _ctrl.defaultEnableFloat,
                           onChanged: _ctrl.setDefaultEnableFloat,
@@ -401,7 +425,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             horizontal: 16,
                             vertical: 4,
                           ),
-                          title: Text(l10n.marqueeChannelTitle),
+                          title: Text(l10n.marqueeChannelTitle, style: titleStyle),
                           subtitle: Text(l10n.marqueeChannelTitleSubtitle),
                           value: _ctrl.defaultMarquee,
                           onChanged: _ctrl.setDefaultMarquee,
@@ -412,7 +436,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             horizontal: 16,
                             vertical: 4,
                           ),
-                          title: Text(l10n.focusNotificationLabel),
+                          title: Text(l10n.focusNotificationLabel, style: titleStyle),
                           subtitle: Text(l10n.focusNotificationLabelSubtitle),
                           value: _ctrl.defaultFocusNotif,
                           onChanged: _ctrl.setDefaultFocusNotif,
@@ -423,7 +447,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             horizontal: 16,
                             vertical: 4,
                           ),
-                          title: Text(l10n.preserveStatusBarSmallIconLabel),
+                          title: Text(l10n.preserveStatusBarSmallIconLabel, style: titleStyle),
                           subtitle: Text(
                             l10n.preserveStatusBarSmallIconLabelSubtitle,
                           ),
@@ -436,7 +460,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             horizontal: 16,
                             vertical: 4,
                           ),
-                          title: Text(l10n.islandIconLabel),
+                          title: Text(l10n.islandIconLabel, style: titleStyle),
                           subtitle: Text(l10n.islandIconLabelSubtitle),
                           value: _ctrl.defaultShowIslandIcon,
                           onChanged: _ctrl.setDefaultShowIslandIcon,
@@ -449,8 +473,11 @@ class _SettingsPageState extends State<SettingsPage> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 24),
-                  SectionLabel(l10n.appearanceSection),
+                  const SizedBox(height: 8),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 18),
+                    child: SectionLabel(l10n.appearanceSection),
+                  ),
                   const SizedBox(height: 8),
                   Card(
                     elevation: 0,
@@ -465,7 +492,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             horizontal: 16,
                             vertical: 4,
                           ),
-                          title: Text(l10n.roundIconTitle),
+                          title: Text(l10n.roundIconTitle, style: titleStyle),
                           subtitle: Text(l10n.roundIconSubtitle),
                           value: _ctrl.roundIcon,
                           onChanged: _onRoundIconChanged,
@@ -481,7 +508,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           ),
                           title: Row(
                             children: [
-                              Expanded(child: Text(l10n.marqueeChannelTitle)),
+                              Expanded(child: Text(l10n.marqueeChannelTitle, style: titleStyle)),
                               Text(
                                 l10n.marqueeSpeedLabel(_ctrl.marqueeSpeed),
                                 style: Theme.of(context).textTheme.bodySmall
@@ -541,7 +568,10 @@ class _SettingsPageState extends State<SettingsPage> {
                             horizontal: 16,
                             vertical: 4,
                           ),
-                          title: Text(l10n.themeModeTitle),
+                          title: Text(
+                            l10n.themeModeTitle,
+                            style: titleStyle,
+                          ),
                           subtitle: Text(_themeModeLabel(l10n)),
                           onTap: () => _showThemeModeDialog(l10n),
                         ),
@@ -551,7 +581,10 @@ class _SettingsPageState extends State<SettingsPage> {
                             horizontal: 16,
                             vertical: 4,
                           ),
-                          title: Text(l10n.languageTitle),
+                          title: Text(
+                            l10n.languageTitle,
+                            style: titleStyle,
+                          ),
                           subtitle: Text(_localeLabel(l10n)),
                           onTap: () => _showLanguageDialog(l10n),
                           shape: RoundedRectangleBorder(
@@ -563,8 +596,11 @@ class _SettingsPageState extends State<SettingsPage> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 24),
-                  SectionLabel(l10n.configSection),
+                  const SizedBox(height: 8),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 18),
+                    child: SectionLabel(l10n.configSection),
+                  ),
                   const SizedBox(height: 8),
                   Card(
                     elevation: 0,
@@ -585,7 +621,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             ),
                           ),
                           leading: const Icon(Icons.upload_file_outlined),
-                          title: Text(l10n.exportToFile),
+                          title: Text(l10n.exportToFile, style: titleStyle),
                           subtitle: Text(l10n.exportToFileSubtitle),
                           onTap: _exportToFile,
                         ),
@@ -596,7 +632,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             vertical: 4,
                           ),
                           leading: const Icon(Icons.copy_outlined),
-                          title: Text(l10n.exportToClipboard),
+                          title: Text(l10n.exportToClipboard, style: titleStyle),
                           subtitle: Text(l10n.exportToClipboardSubtitle),
                           onTap: _exportToClipboard,
                         ),
@@ -607,7 +643,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             vertical: 4,
                           ),
                           leading: const Icon(Icons.download_outlined),
-                          title: Text(l10n.importFromFile),
+                          title: Text(l10n.importFromFile, style: titleStyle),
                           subtitle: Text(l10n.importFromFileSubtitle),
                           onTap: _importFromFile,
                         ),
@@ -623,15 +659,18 @@ class _SettingsPageState extends State<SettingsPage> {
                             ),
                           ),
                           leading: const Icon(Icons.paste_outlined),
-                          title: Text(l10n.importFromClipboard),
+                          title: Text(l10n.importFromClipboard, style: titleStyle),
                           subtitle: Text(l10n.importFromClipboardSubtitle),
                           onTap: _importFromClipboard,
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 24),
-                  SectionLabel(l10n.aboutSection),
+                  const SizedBox(height: 8),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 18),
+                    child: SectionLabel(l10n.aboutSection),
+                  ),
                   const SizedBox(height: 8),
                   Card(
                     elevation: 0,
@@ -643,15 +682,15 @@ class _SettingsPageState extends State<SettingsPage> {
                       children: [
                         ListTile(
                           leading: const Icon(Icons.system_update_outlined),
-                          title: Text(l10n.checkUpdate),
+                          title: Text(l10n.checkUpdate, style: titleStyle),
                           trailing: _checkingUpdate
                               ? const SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                  ),
-                                )
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                            ),
+                          )
                               : null,
                           onTap: _checkingUpdate ? null : _doCheckUpdate,
                         ),
@@ -663,7 +702,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             ),
                           ),
                           leading: const Icon(Icons.code),
-                          title: const Text('GitHub'),
+                          title: const Text('GitHub', style: titleStyle),
                           subtitle: const Text('1812z/HyperIsland'),
                           trailing: const Icon(Icons.open_in_new, size: 18),
                           onTap: () => launchUrl(
@@ -679,7 +718,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             ),
                           ),
                           leading: const Icon(Icons.group_outlined),
-                          title: Text(l10n.qqGroup),
+                          title: Text(l10n.qqGroup, style: titleStyle),
                           subtitle: const Text('1045114341'),
                           trailing: const Icon(Icons.copy, size: 18),
                           onTap: () {
