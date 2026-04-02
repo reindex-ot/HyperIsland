@@ -95,7 +95,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String lsposedApiVersion(int version) {
-    return 'LSPosed API Version: $version';
+    return 'LSPosed API 版本：$version';
   }
 
   @override
@@ -150,8 +150,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aboutSection => 'About';
 
   @override
-  String get keepFocusNotifTitle =>
-      'Keep focus notification after download pause';
+  String get keepFocusNotifTitle => 'Keep notification after download pause';
 
   @override
   String get keepFocusNotifSubtitle =>
@@ -180,18 +179,16 @@ class AppLocalizationsEn extends AppLocalizations {
       'Automatically check for new versions when the app starts';
 
   @override
-  String get showWelcomeTitle => 'Show Welcome Message';
+  String get showWelcomeTitle => '显示启动欢迎语';
 
   @override
-  String get showWelcomeSubtitle =>
-      'Show a welcome notification on the island when the app starts';
+  String get showWelcomeSubtitle => '应用启动时在超级岛显示欢迎信息';
 
   @override
-  String get interactionHapticsTitle => 'Interaction Haptics';
+  String get interactionHapticsTitle => '交互触感';
 
   @override
-  String get interactionHapticsSubtitle =>
-      'Enable Hyper-custom haptic feedback for switches, sliders, and buttons';
+  String get interactionHapticsSubtitle => '为开关、滑块和按钮启用 Hyper 定制震感反馈';
 
   @override
   String get checkUpdate => 'Check for updates';
@@ -200,11 +197,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get alreadyLatest => 'Already on the latest version';
 
   @override
-  String get useAppIconTitle => 'Use app icon';
+  String get useAppIconTitle => '使用应用图标';
 
   @override
-  String get useAppIconSubtitle =>
-      'Use app icon for Download Manager notifications';
+  String get useAppIconSubtitle => '下载管理器通知使用应用图标';
 
   @override
   String get roundIconTitle => 'Round icon corners';
@@ -216,7 +212,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get marqueeChannelTitle => 'Text Scrolling Island';
 
   @override
-  String get marqueeSpeedTitle => 'Scroll Speed';
+  String get marqueeSpeedTitle => 'Speed';
 
   @override
   String marqueeSpeedLabel(int speed) {
@@ -266,11 +262,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get exportToClipboardSubtitle => 'Copy configuration as JSON text';
 
   @override
-  String get exportConfig => 'Export configuration';
+  String get exportConfig => '导出配置';
 
   @override
-  String get exportConfigSubtitle =>
-      'Choose file or clipboard as the destination';
+  String get exportConfigSubtitle => '选择导出到文件或剪贴板';
 
   @override
   String get importFromFile => 'Import from file';
@@ -286,10 +281,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Restore configuration from JSON text in clipboard';
 
   @override
-  String get importConfig => 'Import configuration';
+  String get importConfig => '导入配置';
 
   @override
-  String get importConfigSubtitle => 'Choose file or clipboard as the source';
+  String get importConfigSubtitle => '选择从文件或剪贴板导入';
 
   @override
   String get qqGroup => 'QQ Group';
@@ -534,7 +529,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get restoreLockscreenSubtitle =>
-      'Skip focus-notification handling on lockscreen and keep original notification privacy behavior';
+      'Skip focus notification processing on lockscreen, keep original privacy behavior';
 
   @override
   String get firstFloatLabel => 'First float';
@@ -685,41 +680,42 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aiModelHint => 'gpt-4o-mini';
 
   @override
-  String get aiPromptLabel => 'System Prompt';
+  String get aiPromptLabel => 'Custom Prompt';
 
   @override
-  String get aiPromptHint => 'Leave empty to use default';
+  String get aiPromptHint =>
+      'Leave empty to use default: Extract key info, left and right each no more than 6 words or 12 characters';
 
   @override
-  String get aiPromptInUserTitle => 'Prompt in User Message';
+  String get aiPromptInUserTitle => 'Put prompt in user message';
 
   @override
   String get aiPromptInUserSubtitle =>
-      'Some models don\'t support system instructions, use user message instead';
+      'Some models don\'t support system instructions, enable to put prompt in user message';
 
   @override
-  String get aiTimeoutTitle => 'AI Response Timeout';
+  String get aiTimeoutTitle => 'AI 响应超时';
 
   @override
   String aiTimeoutLabel(int seconds) {
-    return '${seconds}s';
+    return 'AI Response Timeout';
   }
 
   @override
-  String get aiTemperatureTitle => 'Sampling Temperature';
+  String get aiTemperatureTitle => '采样温度 (Temperature)';
 
   @override
   String get aiTemperatureSubtitle => '控制回答的随机性。0 为准确，1 则更具创意';
 
   @override
-  String get aiMaxTokensTitle => 'Max Tokens';
+  String get aiMaxTokensTitle => '最大 Token 数 (Max Tokens)';
 
   @override
   String get aiMaxTokensSubtitle => '限制 AI 生成回答的最大长度';
 
   @override
   String get aiDefaultPromptFull =>
-      'Leave empty for default: extract key info, max 6 chars left / 12 chars right';
+      '留空使用默认提示词：根据通知信息，提取关键信息，左右分别不超过 6 汉字 12 字符';
 
   @override
   String get aiTestButton => 'Test Connection';
@@ -728,71 +724,70 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aiTestUrlEmpty => 'Please enter an API URL first';
 
   @override
-  String get aiLastLogTitle => 'Latest AI Request Log';
+  String get aiLastLogTitle => '最近一次 AI 请求日志';
 
   @override
-  String get aiLastLogSubtitle =>
-      'Requests from both test connection and live notifications appear here';
+  String get aiLastLogSubtitle => '测试连接和通知触发的 AI 请求都会显示在这里';
 
   @override
-  String get aiLastLogEmpty => 'No AI request log yet';
+  String get aiLastLogEmpty => '还没有可显示的 AI 请求日志';
 
   @override
-  String get aiLastLogSourceLabel => 'Source';
+  String get aiLastLogSourceLabel => '来源';
 
   @override
-  String get aiLastLogTimeLabel => 'Time';
+  String get aiLastLogTimeLabel => '时间';
 
   @override
-  String get aiLastLogStatusLabel => 'Status';
+  String get aiLastLogStatusLabel => '状态';
 
   @override
-  String get aiLastLogDurationLabel => 'Duration';
+  String get aiLastLogDurationLabel => '耗时';
 
   @override
-  String get aiLastLogSourceNotification => 'Notification';
+  String get aiLastLogSourceNotification => '通知触发';
 
   @override
-  String get aiLastLogSourceSettingsTest => 'Settings Test';
+  String get aiLastLogSourceSettingsTest => '设置页测试';
 
   @override
-  String get aiLastLogRendered => 'Rendered';
+  String get aiLastLogRendered => '渲染';
 
   @override
-  String get aiLastLogRaw => 'Raw';
+  String get aiLastLogRaw => '原始';
 
   @override
-  String get aiLastLogCopy => 'Copy Log';
+  String get aiLastLogCopy => '复制日志';
 
   @override
-  String get aiLastLogCopied => 'AI request log copied';
+  String get aiLastLogCopied => 'AI 请求日志已复制';
 
   @override
-  String get aiLastLogRequest => 'Request';
+  String get aiLastLogRequest => '请求';
 
   @override
-  String get aiLastLogResponse => 'Response';
+  String get aiLastLogResponse => '回复';
 
   @override
-  String get aiLastLogUsage => 'Token Usage';
+  String get aiLastLogUsage => 'Token 用量';
 
   @override
-  String get aiLastLogMessages => 'Messages';
+  String get aiLastLogMessages => '消息';
 
   @override
-  String get aiLastLogError => 'Error';
+  String get aiLastLogError => '错误';
 
   @override
-  String get aiLastLogHttpCode => 'HTTP Status';
+  String get aiLastLogHttpCode => 'HTTP 状态';
 
   @override
-  String get aiLastLogLeftText => 'Left Text';
+  String get aiLastLogLeftText => '左侧文本';
 
   @override
-  String get aiLastLogRightText => 'Right Text';
+  String get aiLastLogRightText => '右侧文本';
 
   @override
-  String get aiLastLogAssistantContent => 'Assistant Content';
+  String get aiLastLogAssistantContent => '模型回复内容';
 
   @override
   String get aiConfigSaveButton => 'Save';
@@ -802,7 +797,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get aiConfigTips =>
-      'AI receives the app package, title, and content of each notification, and returns short left (source) and right (content) text. Compatible with OpenAI-format APIs (e.g. DeepSeek, Claude). Falls back to default logic if no response within 3 seconds.';
+      'AI receives the app package, title, and content of each notification, and returns short left (source) and right (content) text. Compatible with OpenAI-format APIs (e.g. DeepSeek, Claude). Falls back to default logic if no response.';
 
   @override
   String get templateAiNotificationIslandName => 'AI Notification Island';

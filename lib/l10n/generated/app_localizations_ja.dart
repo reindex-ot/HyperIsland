@@ -95,11 +95,11 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String lsposedApiVersion(int version) {
-    return 'LSPosed API 版本: $version';
+    return 'LSPosed API 版本：$version';
   }
 
   @override
-  String get updateLSPosedRequired => '请更新 LSPosed 版本';
+  String get updateLSPosedRequired => 'LSPosed バージョンを更新してください';
 
   @override
   String get systemNotSupported => 'システムは非対応です';
@@ -179,11 +179,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get showWelcomeSubtitle => '应用启动时在超级岛显示欢迎信息';
 
   @override
-  String get interactionHapticsTitle => '操作触覚';
+  String get interactionHapticsTitle => '交互触感';
 
   @override
-  String get interactionHapticsSubtitle =>
-      'スイッチ、スライダー、ボタンに Hyper カスタム触覚フィードバックを有効化します';
+  String get interactionHapticsSubtitle => '为开关、滑块和按钮启用 Hyper 定制震感反馈';
 
   @override
   String get checkUpdate => '更新を確認';
@@ -192,10 +191,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get alreadyLatest => '最新のバージョンを使用しています';
 
   @override
-  String get useAppIconTitle => 'アプリアイコンを使用する';
+  String get useAppIconTitle => '使用应用图标';
 
   @override
-  String get useAppIconSubtitle => 'ダウンロードマネージャーの通知でアプリアイコンを使用します';
+  String get useAppIconSubtitle => '下载管理器通知使用应用图标';
 
   @override
   String get roundIconTitle => 'アイコンの角を丸める';
@@ -204,10 +203,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get roundIconSubtitle => '通知アイコンの角を丸めます';
 
   @override
-  String get marqueeChannelTitle => 'Island のテキストをスクロール';
+  String get marqueeChannelTitle => 'Island のテキストをスクロール ';
 
   @override
-  String get marqueeSpeedTitle => '速度 ';
+  String get marqueeSpeedTitle => ' 速度 ';
 
   @override
   String marqueeSpeedLabel(int speed) {
@@ -257,10 +256,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get exportToClipboardSubtitle => '構成の JSON テキストをクリップボードにコピーします';
 
   @override
-  String get exportConfig => '設定をエクスポート';
+  String get exportConfig => '导出配置';
 
   @override
-  String get exportConfigSubtitle => '出力先としてファイルまたはクリップボードを選択します';
+  String get exportConfigSubtitle => '选择导出到文件或剪贴板';
 
   @override
   String get importFromFile => 'ファイルからインポート';
@@ -275,10 +274,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get importFromClipboardSubtitle => 'クリップボードの JSON テキストから構成を復元します';
 
   @override
-  String get importConfig => '設定をインポート';
+  String get importConfig => '导入配置';
 
   @override
-  String get importConfigSubtitle => '入力元としてファイルまたはクリップボードを選択します';
+  String get importConfigSubtitle => '选择从文件或剪贴板导入';
 
   @override
   String get qqGroup => 'QQ グループ';
@@ -485,22 +484,23 @@ class AppLocalizationsJa extends AppLocalizations {
   String get rendererLabel => 'スタイル';
 
   @override
-  String get rendererImageTextWithButtons4Name => '画像+テキスト＋下部テキストボタン';
+  String get rendererImageTextWithButtons4Name => '画像 + テキスト + 下部テキストボタン';
 
   @override
-  String get rendererCoverInfoName => 'カバー情報+自動で折り返す';
+  String get rendererCoverInfoName => 'カバー情報 + 自動で折りたたみ';
 
   @override
-  String get rendererImageTextWithRightTextButtonName => '画像+テキスト+右テキストボタン';
+  String get rendererImageTextWithRightTextButtonName => '画像 + テキスト + 右テキストボタン';
 
   @override
   String get islandIcon => 'Island のアイコン';
 
   @override
-  String get islandIconLabel => '大岛图标';
+  String get islandIconLabel => '大きな Island アイコン';
 
   @override
-  String get islandIconLabelSubtitle => '开启后显示超级岛的大图标（小岛不受影响）';
+  String get islandIconLabelSubtitle =>
+      '有効にすると Island に大きなアイコンを表示します (小さな Island は影響を受けません)';
 
   @override
   String get focusIconLabel => 'フォーカスアイコン';
@@ -512,11 +512,11 @@ class AppLocalizationsJa extends AppLocalizations {
   String get preserveStatusBarSmallIconLabel => 'ステータスバーアイコン';
 
   @override
-  String get restoreLockscreenTitle => 'Lockscreen 通知を復元';
+  String get restoreLockscreenTitle => 'ロック画面通知復元';
 
   @override
   String get restoreLockscreenSubtitle =>
-      'ロック画面ではフォーカス通知処理をスキップし、元の通知プライバシー挙動を維持します';
+      'ロック画面時にフォーカス通知処理をスキップし、元の通知プライバシー動作を維持';
 
   @override
   String get firstFloatLabel => '最初にフロート表示';
@@ -662,23 +662,25 @@ class AppLocalizationsJa extends AppLocalizations {
   String get aiModelHint => 'gpt-4o-mini';
 
   @override
-  String get aiPromptLabel => 'システムプロンプト';
+  String get aiPromptLabel => 'カスタムプロンプト';
 
   @override
-  String get aiPromptHint => '空のままにしてデフォルトを使用';
+  String get aiPromptHint =>
+      'デフォルトを使用する場合は空欄: 左右それぞれ 6 単語または 12 文字以内の重要な情報を抽出します';
 
   @override
-  String get aiPromptInUserTitle => '提示词放在用户消息';
+  String get aiPromptInUserTitle => 'ユーザーメッセージにプロンプトを表示する';
 
   @override
-  String get aiPromptInUserSubtitle => '某些模型不支持系统指令，开启后将提示词放在用户消息中';
+  String get aiPromptInUserSubtitle =>
+      '一部のモデルではシステム命令がサポートされていないため、ユーザーメッセージにプロンプ​​トを表示させることができません';
 
   @override
   String get aiTimeoutTitle => 'AI 响应超时';
 
   @override
   String aiTimeoutLabel(int seconds) {
-    return '${seconds}s';
+    return 'AI レスポンスのタイムアウト';
   }
 
   @override
@@ -694,40 +696,41 @@ class AppLocalizationsJa extends AppLocalizations {
   String get aiMaxTokensSubtitle => '限制 AI 生成回答的最大长度';
 
   @override
-  String get aiDefaultPromptFull => '留空使用默认提示词：根据通知信息，提取关键信息，左右分别不超过6汉字12字符';
+  String get aiDefaultPromptFull =>
+      '留空使用默认提示词：根据通知信息，提取关键信息，左右分别不超过 6 汉字 12 字符';
 
   @override
-  String get aiTestButton => '接続テスト';
+  String get aiTestButton => 'テスト接続';
 
   @override
   String get aiTestUrlEmpty => '始めに API URL を入力してください';
 
   @override
-  String get aiLastLogTitle => '最新の AI リクエストログ';
+  String get aiLastLogTitle => '最近一次 AI 请求日志';
 
   @override
-  String get aiLastLogSubtitle => '接続テストと通知トリガーの AI リクエストをここに表示します';
+  String get aiLastLogSubtitle => '测试连接和通知触发的 AI 请求都会显示在这里';
 
   @override
-  String get aiLastLogEmpty => '表示できる AI リクエストログはまだありません';
+  String get aiLastLogEmpty => '还没有可显示的 AI 请求日志';
 
   @override
-  String get aiLastLogSourceLabel => 'ソース';
+  String get aiLastLogSourceLabel => '来源';
 
   @override
-  String get aiLastLogTimeLabel => '時刻';
+  String get aiLastLogTimeLabel => '时间';
 
   @override
-  String get aiLastLogStatusLabel => '状態';
+  String get aiLastLogStatusLabel => '状态';
 
   @override
   String get aiLastLogDurationLabel => '耗时';
 
   @override
-  String get aiLastLogSourceNotification => '通知トリガー';
+  String get aiLastLogSourceNotification => '通知触发';
 
   @override
-  String get aiLastLogSourceSettingsTest => '設定ページのテスト';
+  String get aiLastLogSourceSettingsTest => '设置页测试';
 
   @override
   String get aiLastLogRendered => '渲染';
@@ -748,7 +751,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get aiLastLogResponse => '回复';
 
   @override
-  String get aiLastLogUsage => 'Token 使用量';
+  String get aiLastLogUsage => 'Token 用量';
 
   @override
   String get aiLastLogMessages => '消息';
@@ -776,7 +779,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get aiConfigTips =>
-      'AI は各通知のアプリパッケージ、タイトル、コンテンツを受信し短い左側 (ソース) と右側 (コンテンツ) のテキストを返します。OpenAI 形式の API (DeepSeek、Claude など) と互換性があります。3 秒以内に応答がない場合は、デフォルトのロジックにフォールバックします。';
+      'AI は各通知のアプリパッケージ、タイトル、コンテンツを受信し短い左側 (ソース) と右側 (コンテンツ) のテキストを返します。OpenAI 形式の API (DeepSeek、Claude など) と互換性があります。応答がない場合は、デフォルトのロジックにフォールバックします。';
 
   @override
   String get templateAiNotificationIslandName => 'AI Notification Island';

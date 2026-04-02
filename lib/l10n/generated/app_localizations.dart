@@ -267,7 +267,7 @@ abstract class AppLocalizations {
   /// No description provided for @lsposedApiVersion.
   ///
   /// In zh, this message translates to:
-  /// **'LSPosed API 版本: {version}'**
+  /// **'LSPosed API 版本：{version}'**
   String lsposedApiVersion(int version);
 
   /// No description provided for @updateLSPosedRequired.
@@ -927,7 +927,7 @@ abstract class AppLocalizations {
   /// No description provided for @templateNotificationIslandLiteName.
   ///
   /// In zh, this message translates to:
-  /// **'通知超级岛|精简'**
+  /// **'通知超级岛 | 精简'**
   String get templateNotificationIslandLiteName;
 
   /// No description provided for @templateDownloadLiteName.
@@ -957,19 +957,19 @@ abstract class AppLocalizations {
   /// No description provided for @rendererImageTextWithButtons4Name.
   ///
   /// In zh, this message translates to:
-  /// **'新图文组件+底部文本按钮'**
+  /// **'新图文组件 + 底部文本按钮'**
   String get rendererImageTextWithButtons4Name;
 
   /// No description provided for @rendererCoverInfoName.
   ///
   /// In zh, this message translates to:
-  /// **'封面组件+自动换行'**
+  /// **'封面组件 + 自动换行'**
   String get rendererCoverInfoName;
 
   /// No description provided for @rendererImageTextWithRightTextButtonName.
   ///
   /// In zh, this message translates to:
-  /// **'新图文组件+右侧文本按钮'**
+  /// **'新图文组件 + 右侧文本按钮'**
   String get rendererImageTextWithRightTextButtonName;
 
   /// No description provided for @islandIcon.
@@ -1347,7 +1347,7 @@ abstract class AppLocalizations {
   /// No description provided for @aiDefaultPromptFull.
   ///
   /// In zh, this message translates to:
-  /// **'留空使用默认提示词：根据通知信息，提取关键信息，左右分别不超过6汉字12字符'**
+  /// **'留空使用默认提示词：根据通知信息，提取关键信息，左右分别不超过 6 汉字 12 字符'**
   String get aiDefaultPromptFull;
 
   /// No description provided for @aiTestButton.

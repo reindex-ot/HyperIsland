@@ -95,7 +95,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String lsposedApiVersion(int version) {
-    return 'LSPosed API 版本: $version';
+    return 'LSPosed API 版本：$version';
   }
 
   @override
@@ -465,7 +465,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get templateNotificationIslandName => '通知超级岛';
 
   @override
-  String get templateNotificationIslandLiteName => '通知超级岛|精简';
+  String get templateNotificationIslandLiteName => '通知超级岛 | 精简';
 
   @override
   String get templateDownloadLiteName => '下载|Lite';
@@ -480,13 +480,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get rendererLabel => '样式';
 
   @override
-  String get rendererImageTextWithButtons4Name => '新图文组件+底部文本按钮';
+  String get rendererImageTextWithButtons4Name => '新图文组件 + 底部文本按钮';
 
   @override
-  String get rendererCoverInfoName => '封面组件+自动换行';
+  String get rendererCoverInfoName => '封面组件 + 自动换行';
 
   @override
-  String get rendererImageTextWithRightTextButtonName => '新图文组件+右侧文本按钮';
+  String get rendererImageTextWithRightTextButtonName => '新图文组件 + 右侧文本按钮';
 
   @override
   String get islandIcon => '超级岛图标';
@@ -685,7 +685,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get aiMaxTokensSubtitle => '限制 AI 生成回答的最大长度';
 
   @override
-  String get aiDefaultPromptFull => '留空使用默认提示词：根据通知信息，提取关键信息，左右分别不超过6汉字12字符';
+  String get aiDefaultPromptFull =>
+      '留空使用默认提示词：根据通知信息，提取关键信息，左右分别不超过 6 汉字 12 字符';
 
   @override
   String get aiTestButton => '测试连接';
