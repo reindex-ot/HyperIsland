@@ -94,6 +94,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get enableInLSPosed => '请在 LSPosed 中启用本模块';
 
   @override
+  String get updateLSPosedRequired => '请更新 LSPosed 版本';
+
+  @override
   String get systemNotSupported => '系统不支持';
 
   @override
@@ -656,7 +659,4 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get restoreLockscreenSubtitle => '锁屏时跳过焦点通知处理，保持原始通知隐私行为';
-
-  @override
-  String get restoreLockscreenLabelSubtitle => '锁屏时保持原始通知隐私行为，不解锁仍显示隐藏内容';
 }

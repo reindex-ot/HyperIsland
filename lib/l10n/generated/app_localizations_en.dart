@@ -94,6 +94,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get enableInLSPosed => 'Please enable this module in LSPosed';
 
   @override
+  String get updateLSPosedRequired => 'Please update LSPosed version';
+
+  @override
   String get systemNotSupported => 'System Not Supported';
 
   @override
@@ -687,8 +690,4 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get restoreLockscreenSubtitle =>
       'Skip focus notification processing on lockscreen, keep original privacy behavior';
-
-  @override
-  String get restoreLockscreenLabelSubtitle =>
-      'Keep original notification privacy on lockscreen, hidden content stays hidden until unlock';
 }

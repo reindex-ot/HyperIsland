@@ -94,6 +94,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get enableInLSPosed => 'LSPosed でこのモジュールを有効化してください';
 
   @override
+  String get updateLSPosedRequired => 'LSPosed バージョンを更新してください';
+
+  @override
   String get systemNotSupported => 'システムは非対応です';
 
   @override
@@ -667,8 +670,4 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get restoreLockscreenSubtitle =>
       'ロック画面時にフォーカス通知処理をスキップし、元の通知プライバシー動作を維持';
-
-  @override
-  String get restoreLockscreenLabelSubtitle =>
-      'ロック画面時に元の通知プライバシー動作を維持し、解除前は隠しコンテンツを表示しない';
 }

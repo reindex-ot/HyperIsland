@@ -94,6 +94,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get enableInLSPosed => 'Lütfen bu modülü LSPosed içinde etkinleştirin';
 
   @override
+  String get updateLSPosedRequired => 'Lütfen LSPosed sürümünü güncelleyin';
+
+  @override
   String get systemNotSupported => 'Sistem Desteklenmiyor';
 
   @override
@@ -692,8 +695,4 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get restoreLockscreenSubtitle =>
       'Kilit ekranında odak bildirimi işlemini atlayın, özgün gizlilik davranışını koruyun';
-
-  @override
-  String get restoreLockscreenLabelSubtitle =>
-      'Kilit ekranında özgün bildirim gizlilik davranışını koruyun, gizli içerik kilit açılana kadar görünmez';
 }

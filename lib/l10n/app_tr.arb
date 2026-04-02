@@ -40,6 +40,7 @@
   "activated": "Etkin",
   "notActivated": "Etkin Değil",
   "enableInLSPosed": "Lütfen bu modülü LSPosed içinde etkinleştirin",
+  "updateLSPosedRequired": "Lütfen LSPosed sürümünü güncelleyin",
   "systemNotSupported": "Sistem Desteklenmiyor",
   "systemNotSupportedSubtitle": "Mevcut sistem Dynamic Island özelliğini desteklemiyor (protokol sürümü {version}, gereken sürüm: 3)",
   "@systemNotSupportedSubtitle": {
@@ -342,5 +343,5 @@
   "hideDesktopIconSubtitle": "Uygulama simgesini başlatıcıdan gizler. Gizledikten sonra LSPosed Manager üzerinden açın",
 
   "restoreLockscreenTitle": "Kilit Ekranı Bildirimini Geri Yükle",
-  "restoreLockscreenSubtitle": "Kilit ekranında odak bildirimi işlemini atlayın, özgün gizlilik davranışını koruyun",
+  "restoreLockscreenSubtitle": "Kilit ekranında odak bildirimi işlemini atlayın, özgün gizlilik davranışını koruyun"
 }

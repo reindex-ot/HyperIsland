@@ -264,6 +264,12 @@ abstract class AppLocalizations {
   /// **'请在 LSPosed 中启用本模块'**
   String get enableInLSPosed;
 
+  /// No description provided for @updateLSPosedRequired.
+  ///
+  /// In zh, this message translates to:
+  /// **'请更新 LSPosed 版本'**
+  String get updateLSPosedRequired;
+
   /// No description provided for @systemNotSupported.
   ///
   /// In zh, this message translates to:
@@ -1295,12 +1301,6 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'锁屏时跳过焦点通知处理，保持原始通知隐私行为'**
   String get restoreLockscreenSubtitle;
-
-  /// No description provided for @restoreLockscreenLabelSubtitle.
-  ///
-  /// In zh, this message translates to:
-  /// **'锁屏时保持原始通知隐私行为，不解锁仍显示隐藏内容'**
-  String get restoreLockscreenLabelSubtitle;
 }
 
 class _AppLocalizationsDelegate

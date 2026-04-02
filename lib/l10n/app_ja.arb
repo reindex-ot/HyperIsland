@@ -27,6 +27,7 @@
   "activated": "有効",
   "notActivated": "無効",
   "enableInLSPosed": "LSPosed でこのモジュールを有効化してください",
+  "updateLSPosedRequired": "LSPosed バージョンを更新してください",
   "systemNotSupported": "システムは非対応です",
   "systemNotSupportedSubtitle": "システムは Dynamic Island に非対応です (現在のプロトコルバージョンは {version}、プロトコルバージョン 3 が必要です)",
   "@systemNotSupportedSubtitle": {
@@ -218,5 +219,5 @@
   "aiTimeoutLabel": "AI レスポンスのタイムアウト",
 
   "restoreLockscreenTitle": "ロック画面通知復元",
-  "restoreLockscreenSubtitle": "ロック画面時にフォーカス通知処理をスキップし、元の通知プライバシー動作を維持",
+  "restoreLockscreenSubtitle": "ロック画面時にフォーカス通知処理をスキップし、元の通知プライバシー動作を維持"
 }
