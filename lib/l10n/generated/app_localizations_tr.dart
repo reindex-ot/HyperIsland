@@ -680,8 +680,20 @@ class AppLocalizationsTr extends AppLocalizations {
   String get aiTimeoutLabel => 'AI Yanıt Zaman Aşımı';
 
   @override
-  String get hideDesktopIconTitle => '隐藏桌面图标';
+  String get hideDesktopIconTitle => 'Ana Ekran Simgesini Gizle';
 
   @override
-  String get hideDesktopIconSubtitle => '隐藏启动器中的应用图标，隐藏后可通过 LSPosed 管理器打开';
+  String get hideDesktopIconSubtitle =>
+      'Uygulama simgesini başlatıcıdan gizler. Gizledikten sonra LSPosed Manager üzerinden açın';
+
+  @override
+  String get restoreLockscreenTitle => 'Kilit Ekranı Bildirimini Geri Yükle';
+
+  @override
+  String get restoreLockscreenSubtitle =>
+      'Kilit ekranında odak bildirimi işlemini atlayın, özgün gizlilik davranışını koruyun';
+
+  @override
+  String get restoreLockscreenLabelSubtitle =>
+      'Kilit ekranında özgün bildirim gizlilik davranışını koruyun, gizli içerik kilit açılana kadar görünmez';
 }
