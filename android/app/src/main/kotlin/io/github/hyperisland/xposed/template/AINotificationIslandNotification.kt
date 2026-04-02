@@ -83,6 +83,8 @@ object AINotificationIslandNotification : IslandTemplate {
         val prompt: String,
         val timeout: Int,
         val promptInUser: Boolean,
+        val temperature: Float,
+        val maxTokens: Int,
     )
 
     private data class AiIslandText(val left: String, val right: String)
@@ -95,6 +97,8 @@ object AINotificationIslandNotification : IslandTemplate {
         prompt  = ConfigManager.getString("pref_ai_prompt"),
         timeout = ConfigManager.getInt("pref_ai_timeout", 3).coerceIn(3, 15),
         promptInUser = ConfigManager.getBoolean("pref_ai_prompt_in_user", false),
+        temperature = ConfigManager.getFloat("pref_ai_temperature", 0.1f).coerceIn(0f, 1f),
+        maxTokens = ConfigManager.getInt("pref_ai_max_tokens", 50).coerceIn(10, 500),
     )
 
     // ── AI 调用（带超时） ──────────────────────────────────────────────────────
@@ -116,7 +120,7 @@ object AINotificationIslandNotification : IslandTemplate {
     }
 
     private fun callAiApi(config: AiConfig, data: NotifData): AiIslandText? {
-        val requestBody = buildRequestBody(config.model, config.prompt, config.promptInUser, data)
+        val requestBody = buildRequestBody(config, data)
         val conn = (URL(config.url).openConnection() as HttpURLConnection).apply {
             requestMethod = "POST"
             setRequestProperty("Content-Type", "application/json")
@@ -141,9 +145,9 @@ object AINotificationIslandNotification : IslandTemplate {
         }
     }
 
-    private fun buildRequestBody(model: String, customPrompt: String, promptInUser: Boolean, data: NotifData): String {
+    private fun buildRequestBody(config: AiConfig, data: NotifData): String {
         val defaultPrompt = "根据通知信息，提取关键信息，左右分别不超过6汉字12字符"
-        val userPrompt = if (customPrompt.isNotEmpty()) customPrompt else defaultPrompt
+        val userPrompt = if (config.prompt.isNotEmpty()) config.prompt else defaultPrompt
 
         val userContent = buildString {
             append("应用包名：${data.pkg}\n")
@@ -153,7 +157,7 @@ object AINotificationIslandNotification : IslandTemplate {
 
         val messages = org.json.JSONArray()
 
-        if (promptInUser) {
+        if (config.promptInUser) {
             // 提示词放在用户消息中
             val combinedUserContent = buildString {
                 append(userPrompt)
@@ -174,10 +178,10 @@ $userPrompt
         }
 
         return JSONObject()
-            .put("model", model.ifEmpty { "gpt-4o-mini" })
+            .put("model", config.model.ifEmpty { "gpt-4o-mini" })
             .put("messages", messages)
-            .put("max_tokens", 80)
-            .put("temperature", 0.1)
+            .put("max_tokens", config.maxTokens)
+            .put("temperature", config.temperature)
             .toString()
     }
 

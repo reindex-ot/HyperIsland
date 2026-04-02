@@ -80,6 +80,10 @@ object ConfigManager {
             catch (_: ClassCastException) { default }
         }
 
+    fun getFloat(key: String, default: Float): Float =
+        try { prefs?.getFloat(fk(key), default) ?: default }
+        catch (_: ClassCastException) { default }
+
     fun contains(key: String): Boolean =
         prefs?.contains(fk(key)) ?: false
 
