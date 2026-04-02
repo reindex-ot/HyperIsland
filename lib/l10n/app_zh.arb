@@ -1,13 +1,16 @@
 {
   "@@locale": "zh",
+
   "navHome": "主页",
   "navApps": "应用",
   "navSettings": "设置",
+
   "cancel": "取消",
   "confirm": "确认",
   "ok": "确定",
   "apply": "应用",
-  "noChange": "不更改",
+  "noChange": "不更改"
+  ,
   "newVersionFound": "发现新版本",
   "currentVersion": "当前版本：{version}",
   "@currentVersion": {
@@ -41,7 +44,7 @@
   "activated": "已激活",
   "notActivated": "未激活",
   "enableInLSPosed": "请在 LSPosed 中启用本模块",
-  "lsposedApiVersion": "LSPosed API 版本: {version}",
+  "lsposedApiVersion": "LSPosed API 版本：{version}",
   "updateLSPosedRequired": "请更新 LSPosed 版本",
   "@lsposedApiVersion": {
     "placeholders": {
@@ -72,6 +75,7 @@
   "note2": "2.请在 HyperCeiler 中关闭系统界面和小米服务框架的焦点通知白名单",
   "note3": "3.LSPosed 管理器中激活后，必须重启相关作用域软件",
   "note4": "4.支持通用适配，自行勾选合适的模板尝试",
+
   "behaviorSection": "行为",
   "defaultConfigSection": "渠道默认配置",
   "appearanceSection": "外观",
@@ -163,6 +167,7 @@
       }
     }
   },
+
   "appAdaptation": "应用适配",
   "selectedAppsCount": "已选 {count} 个应用",
   "@selectedAppsCount": {
@@ -231,6 +236,7 @@
       }
     }
   },
+
   "cannotReadChannels": "无法读取通知渠道",
   "rootRequiredMessage": "读取通知渠道需要 ROOT 权限。\n请确认已授予本应用 ROOT 权限后重试。",
   "enableAllChannels": "启用全部渠道",
@@ -298,16 +304,18 @@
       }
     }
   },
+
   "templateDownloadName": "下载",
   "templateNotificationIslandName": "通知超级岛",
-  "templateNotificationIslandLiteName": "通知超级岛|精简",
+  "templateNotificationIslandLiteName": "通知超级岛 | 精简",
   "templateDownloadLiteName": "下载|Lite",
   "islandSection": "岛",
   "template": "模板",
+
   "rendererLabel": "样式",
-  "rendererImageTextWithButtons4Name": "新图文组件+底部文本按钮",
-  "rendererCoverInfoName": "封面组件+自动换行",
-  "rendererImageTextWithRightTextButtonName": "新图文组件+右侧文本按钮",
+  "rendererImageTextWithButtons4Name": "新图文组件 + 底部文本按钮",
+  "rendererCoverInfoName": "封面组件 + 自动换行",
+  "rendererImageTextWithRightTextButtonName": "新图文组件 + 右侧文本按钮",
   "islandIcon": "超级岛图标",
   "islandIconLabel": "大岛图标",
   "islandIconLabelSubtitle": "开启后显示超级岛的大图标（小岛不受影响）",
@@ -341,11 +349,13 @@
   "optDefaultOff": "默认（关闭）",
   "optOn": "开启",
   "optOff": "关闭",
+
   "errorInvalidFormat": "配置格式无效",
   "errorNoStorageDir": "无法获取存储目录",
   "errorNoFileSelected": "未选择文件",
   "errorNoFilePath": "无法获取文件路径",
   "errorEmptyClipboard": "剪贴板为空",
+
   "navBlacklist": "通知黑名单",
   "navBlacklistSubtitle": "启动黑名单应用时，停用焦点通知的自动展开功能",
   "presetGamesTitle": "一键过滤热门游戏",
@@ -373,11 +383,13 @@
       }
     }
   },
+
   "firstFloatLabelSubtitle": "超级岛初次收到通知后是否展开为焦点通知",
   "updateFloatLabelSubtitle": "超级岛更新后是否展开通知",
   "marqueeChannelTitleSubtitle": "超级岛消息过长是否滚动显示",
   "focusNotificationLabelSubtitle": "替换通知为焦点通知（关闭后显示原始通知）",
   "preserveStatusBarSmallIconLabelSubtitle": "焦点通知打开时，是否强制保留状态栏小图标",
+
   "aiConfigSection": "AI 增强",
   "aiConfigTitle": "AI 通知摘要",
   "aiConfigSubtitleEnabled": "已启用 · 点击配置 AI 参数",
@@ -408,7 +420,7 @@
       }
     }
   },
-  "aiDefaultPromptFull": "留空使用默认提示词：根据通知信息，提取关键信息，左右分别不超过6汉字12字符",
+  "aiDefaultPromptFull": "留空使用默认提示词：根据通知信息，提取关键信息，左右分别不超过 6 汉字 12 字符",
   "aiTestButton": "测试连接",
   "aiTestUrlEmpty": "请先填写 API 地址",
   "aiLastLogTitle": "最近一次 AI 请求日志",
@@ -437,6 +449,7 @@
   "aiConfigSaved": "AI 配置已保存",
   "aiConfigTips": "AI 将收到通知的应用包名、标题和正文，返回左侧（来源）和右侧（内容）短文本。支持兼容 OpenAI 格式的接口（如 DeepSeek、Claude 等）。超过 3 秒未响应时自动回退到默认逻辑。",
   "templateAiNotificationIslandName": "AI 通知超级岛",
+
   "hideDesktopIconTitle": "隐藏桌面图标",
   "hideDesktopIconSubtitle": "隐藏启动器中的应用图标，隐藏后可通过 LSPosed 管理器打开"
 }
